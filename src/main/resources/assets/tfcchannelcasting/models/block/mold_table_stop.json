@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"ambientocclusion": false,
+	"textures": {
+		"0": "tfcchannelcasting:block/crucible_like",
+		"particle": "tfcchannelcasting:block/crucible_like"
+	},
+	"elements": [
+		{
+			"from": [15, 2, 6],
+			"to": [16, 5, 10],
+			"faces": {
+				"north": {"uv": [0, 11, 1, 14], "texture": "#0"},
+				"east": {"uv": [6, 11, 10, 14], "texture": "#0"},
+				"south": {"uv": [15, 11, 16, 14], "texture": "#0"},
+				"west": {"uv": [6, 11, 10, 14], "texture": "#0"},
+				"up": {"uv": [15, 6, 16, 10], "texture": "#0"},
+				"down": {"uv": [15, 6, 16, 10], "texture": "#0"}
+			}
+		}
+	]
+}

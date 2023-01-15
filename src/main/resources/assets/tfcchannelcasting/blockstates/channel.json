@@ -1,0 +1,90 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "multipart": [
+    {
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_base"
+      }
+    },
+    {
+      "when": {
+        "down": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_bottom"
+      }
+    },
+    {
+      "when": {
+        "north": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_connection",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "north": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_stop",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "east": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_connection",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "east": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_stop",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "south": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_connection",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_stop",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_connection",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/channel_stop",
+        "y": 180
+      }
+    }
+  ]
+}

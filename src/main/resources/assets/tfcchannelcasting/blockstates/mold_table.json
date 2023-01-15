@@ -1,0 +1,46 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "multipart": [
+    {
+      "apply": {
+        "model": "tfcchannelcasting:block/mold_table_base"
+      }
+    },
+    {
+      "when": {
+        "north": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/mold_table_stop",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "east": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/mold_table_stop",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "south": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/mold_table_stop",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": false
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/mold_table_stop",
+        "y": 180
+      }
+    }
+  ]
+}
