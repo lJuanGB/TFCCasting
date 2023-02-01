@@ -21,10 +21,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import vazkii.patchouli.api.IMultiblock;
 import vazkii.patchouli.api.PatchouliAPI;
 
@@ -43,7 +45,10 @@ public class TFCChannelCasting {
 
         bus.addListener(this::setup);
 
-        ClientEventHandler.init();
+        if (FMLEnvironment.dist == Dist.CLIENT)
+        {
+            ClientEventHandler.init();
+        }
     }
 
     public void setup(FMLCommonSetupEvent event)

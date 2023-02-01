@@ -40,24 +40,17 @@ public class ChannelBlockEntity extends TFCBlockEntity
      */
     private int nFlows = 0;
 
-    /*** Color of the flow to render */
-    private int color = 0;
-    /*** Texture of the flow to render */
-    private ResourceLocation texture = new ResourceLocation("");
+    /*** Fluid to render */
+    private ResourceLocation fluid = new ResourceLocation("");
 
     public boolean shouldRender()
     {
         return flowSource.isPresent();
     }
 
-    public int getColor() 
+    public ResourceLocation getFluid() 
     {
-        return color;
-    }
-
-    public ResourceLocation getTexture() 
-    {
-        return texture;
+        return fluid;
     }
 
     public Direction getFlowSource()
@@ -75,13 +68,12 @@ public class ChannelBlockEntity extends TFCBlockEntity
         return nFlows;
     }
 
-    public void setLinkProperties(Direction flowSource, boolean isConnectedToAnotherChannel, int nFlows, int color, ResourceLocation texture)
+    public void setLinkProperties(Direction flowSource, boolean isConnectedToAnotherChannel, int nFlows, ResourceLocation fluid)
     {
         this.flowSource = Optional.of(flowSource);
         this.isConnectedToAnotherChannel = isConnectedToAnotherChannel;
         this.nFlows = nFlows;
-        this.color = color;
-        this.texture = texture;
+        this.fluid = fluid;
 
         level.setBlock(worldPosition, getBlockState().setValue(ChannelBlock.WITH_METAL, this.flowSource.isPresent()), 3);
 
@@ -117,8 +109,7 @@ public class ChannelBlockEntity extends TFCBlockEntity
         if (nFlows <= 0)
         {
             flowSource = Optional.empty();
-            color = 0;
-            texture = new ResourceLocation("");
+            fluid = new ResourceLocation("");
             level.setBlock(worldPosition, getBlockState().setValue(ChannelBlock.WITH_METAL, false), 3);
             markForSync();
         }   
@@ -167,8 +158,7 @@ public class ChannelBlockEntity extends TFCBlockEntity
         isConnectedToAnotherChannel = nbt.getBoolean("useLongRenderBox");
         byte flowSourceByte = nbt.getByte("flowSource");
         flowSource = flowSourceByte != NO_FLOW_BYTE ? Optional.of(Direction.values()[flowSourceByte]) : Optional.empty();
-        texture = new ResourceLocation(nbt.getString("texture"));
-        color = nbt.getInt("color");
+        fluid = new ResourceLocation(nbt.getString("texture"));
     }
 
     @Override
@@ -177,7 +167,6 @@ public class ChannelBlockEntity extends TFCBlockEntity
         nbt.putByte("nFlowsOut", (byte) nFlows);
         nbt.putBoolean("useLongRenderBox", isConnectedToAnotherChannel);
         nbt.putByte("flowSource", flowSource.isPresent() ? (byte) flowSource.get().ordinal() : NO_FLOW_BYTE);
-        nbt.putString("texture", texture.toString());
-        nbt.putInt("color", color);
+        nbt.putString("texture", fluid.toString());
     }
 }

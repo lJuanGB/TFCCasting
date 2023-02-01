@@ -17,16 +17,13 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEnt
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
 
-import net.dries007.tfc.client.RenderHelpers;
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
@@ -42,9 +39,6 @@ public class ChannelFlow
         // Get fluid properties
         FluidStack fluidStack = iFldHandler.get().drain(1, IFluidHandler.FluidAction.SIMULATE);
         Fluid fluid = fluidStack.getFluid();
-        FluidAttributes attributes = fluid.getAttributes();
-        ResourceLocation texture = attributes.getStillTexture(fluidStack);
-        int color = RenderHelpers.getFluidColor(fluidStack);
 
         // Find paths
         int counter = 0;
@@ -182,8 +176,7 @@ public class ChannelFlow
                     flowSource.get(channelOrMold),
                     true, 
                     nFlows.get(channelOrMold),
-                    color,
-                    texture
+                    fluid.getRegistryName()
                 )
             );
             level.getBlockEntity(channelOrMold, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
@@ -197,8 +190,7 @@ public class ChannelFlow
             Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), 
             false, 
             nFlows.get(originChannel), 
-            color, 
-            texture
+            fluid.getRegistryName()
         );
     }
 
