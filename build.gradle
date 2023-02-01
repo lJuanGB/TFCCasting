@@ -6,7 +6,7 @@ plugins {
     id("org.spongepowered.mixin") version "0.7.+"
 }
 
-version = "0.0.0-indev"
+version = "0.1.0-beta"
 group = "com.ljuangbminecraft.tfcchannelcasting"
 archivesBaseName = "tfcchannelcasting"
 
@@ -129,8 +129,8 @@ curseforge {
     apiKey = System.getenv("CURSEFORGE_API_KEY") ?: "nope"
 
     project {
-        id = '453394'
-        changelog = "[Changelog ${version}](https://github.com/eerussianguy/tfcchannelcasting/releases/tag/v${project.version})"
+        id = '820815'
+        changelog = "[Changelog ${version}](https://github.com/lJuanGB/TFCCasting/releases/tag/v${project.version})"
         changelogType = "markdown"
 
         releaseType = project.version.contains("beta") ? "beta" : (project.version.contains("alpha") ? "alpha" : "release")
