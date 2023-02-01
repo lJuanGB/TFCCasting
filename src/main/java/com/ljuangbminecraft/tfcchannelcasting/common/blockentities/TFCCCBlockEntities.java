@@ -19,6 +19,7 @@ public class TFCCCBlockEntities
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
 
     public static final RegistryObject<BlockEntityType<MoldBlockEntity>> MOLD_TABLE = register("mold_table", MoldBlockEntity::new, TFCCCBlocks.MOLD_TABLE);
+    public static final RegistryObject<BlockEntityType<ChannelBlockEntity>> CHANNEL = register("channel", ChannelBlockEntity::new, TFCCCBlocks.CHANNEL);
 
     private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, BlockEntityType.BlockEntitySupplier<T> factory, Supplier<? extends Block> block)
     {

@@ -21,7 +21,7 @@ modId="tfcchannelcasting" #mandatory
 # see the associated build.gradle script for how to populate this completely automatically during a build
 version="${file.jarVersion}" #mandatory
  # A display name for the mod
-displayName="TFC Tracking" #mandatory
+displayName="TFC Casting with Channels" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://mcforge.readthedocs.io/en/latest/gettingstarted/autoupdate/
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
@@ -34,7 +34,7 @@ credits="Thanks for this mod goes to the TFC authors and community" #optional
 authors="lJuanGB" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A mod to add tracking as a way of hunting to TFC:TNG.
+A mod to add casting through channels for the crucible.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.tfcchannelcasting]]
@@ -52,7 +52,7 @@ A mod to add tracking as a way of hunting to TFC:TNG.
     modId="tfc"
     mandatory=true
     versionRange="[2.1.0-beta,)"
-    ordering="NONE"
+    ordering="BEFORE"
     side="BOTH"
 [[dependencies.tfcchannelcasting]]
     modId="minecraft"

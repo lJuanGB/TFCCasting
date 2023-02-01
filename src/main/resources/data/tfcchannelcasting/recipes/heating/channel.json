@@ -1,0 +1,11 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:heating",
+  "ingredient": {
+    "item": "tfcchannelcasting:unfired_channel"
+  },
+  "result_item": {
+    "item": "tfcchannelcasting:channel"
+  },
+  "temperature": 1399
+}

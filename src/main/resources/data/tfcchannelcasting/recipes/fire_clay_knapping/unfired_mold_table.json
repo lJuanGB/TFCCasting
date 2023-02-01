@@ -1,0 +1,14 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:fire_clay_knapping",
+  "pattern": [
+    "XXXXX",
+    "X   X",
+    "X   X",
+    "X   X",
+    "XXXXX"
+  ],
+  "result": {
+    "item": "tfcchannelcasting:unfired_mold_table"
+  }
+}

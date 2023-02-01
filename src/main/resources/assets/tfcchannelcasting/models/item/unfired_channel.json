@@ -1,0 +1,7 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "parent": "tfcchannelcasting:item/channel",
+  "textures": {
+    "0": "tfc:block/fire_clay_block"
+  }
+}

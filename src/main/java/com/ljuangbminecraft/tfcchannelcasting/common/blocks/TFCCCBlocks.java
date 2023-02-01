@@ -30,7 +30,8 @@ public class TFCCCBlocks {
     public static final RegistryObject<Block> CHANNEL = register(
         "channel",
         () -> new ChannelBlock(
-            ExtendedProperties.of(Material.METAL).strength(3).sound(SoundType.METAL)
+            ExtendedProperties.of(Material.METAL).strength(3).sound(SoundType.METAL).blockEntity(TFCCCBlockEntities.CHANNEL)
+            .lightLevel(s -> s.getValue(ChannelBlock.WITH_METAL) ? 10 : 0)
         ),
         DECORATIONS
         );

@@ -1,7 +1,4 @@
 package com.ljuangbminecraft.tfcchannelcasting.common;
-
-import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.LOGGER;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -23,15 +17,36 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEnt
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
 
+import net.dries007.tfc.client.RenderHelpers;
+import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class ChannelFlow 
 {
-    public static ChannelFlow fromSource(Level level, BlockPos originChannel)
+    public static void fromCrucible(LevelAccessor level, CrucibleBlockEntity source, BlockPos originChannel)
     {
+        // This checks that metal is present and molten
+        Optional<IFluidHandler> iFldHandler = MoldBlockEntity.getFluidHandlerIfAppropriate(source, Optional.empty());
+
+        if (iFldHandler.isEmpty()) return;
+
+        // Get fluid properties
+        FluidStack fluidStack = iFldHandler.get().drain(1, IFluidHandler.FluidAction.SIMULATE);
+        Fluid fluid = fluidStack.getFluid();
+        FluidAttributes attributes = fluid.getAttributes();
+        ResourceLocation texture = attributes.getStillTexture(fluidStack);
+        int color = RenderHelpers.getFluidColor(fluidStack);
+
+        // Find paths
         int counter = 0;
         final BiMap<Integer, BlockPos> channelsAndMolds = HashBiMap.create();
 
@@ -65,11 +80,33 @@ public class ChannelFlow
             // The neighbors of the channel are both the channel and mold
             neighbors.put(current, adjacentChannels);
             neighbors.get(current).addAll(adjacentMolds);
+        }
 
-            
-            // LOGGER.debug("Visting: " + current);
-            // LOGGER.debug("  Pending visit: " + pendingVisit.stream().map(a->a.toString()).collect(Collectors.toList()));
-            // LOGGER.debug("  Visited: " + channels.values().stream().map(a->a.toString()).collect(Collectors.toList()));
+        // Remove molds if they don't meet the following criteria:
+        //   - The output stack is not empty
+        //   - The mold could not accept the fluid
+        // Removing them now removes molds that will get disconected
+        // after a single tick and without getting any fluid, which
+        // improves performance a bit and most importantly prevents
+        // a flickering rendered flow. 
+        molds.removeIf(
+            pos -> {
+                Optional<MoldBlockEntity> moldEnt = level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get());
+
+                if (moldEnt.isEmpty()) return true;
+
+                if (!moldEnt.get().getOutputStack().isEmpty()) return true;
+
+                final FluidStack outputDrop = iFldHandler.get().drain(1, IFluidHandler.FluidAction.SIMULATE);
+                final FluidStack outputRemainder = Helpers.mergeOutputFluidIntoSlot(moldEnt.get().getInventory(), outputDrop, source.getTemperature(), MoldBlockEntity.MOLD_SLOT);
+                return !outputRemainder.isEmpty();
+            }
+        );
+
+        // Early exit if no (valid) molds are connected
+        if (molds.size() == 0)
+        {
+            return;
         }
 
         // Add a numeric index to the molds
@@ -78,9 +115,6 @@ public class ChannelFlow
             channelsAndMolds.put(counter, mold);
             counter++;
         }
-
-        LOGGER.debug(channelsAndMolds.values().stream().map(a->a.toString()).collect(Collectors.toList()).toString());
-        LOGGER.debug(neighbors.entrySet().stream().map(a->a.getKey().toString() + " " + a.getValue().toString()).collect(Collectors.toList()).toString());
 
         int[][] graph = new int[channelsAndMolds.size()][channelsAndMolds.size()];
         double[][] heuristic = new double[channelsAndMolds.size()][channelsAndMolds.size()];
@@ -97,7 +131,15 @@ public class ChannelFlow
 
             for (BlockPos neighborChannelOrMold : neighbors.get(channel))
             {
-                int x = channelsAndMolds.inverse().get(channel); 
+                int x = channelsAndMolds.inverse().get(channel);
+
+                // Might not be there if the mold table was removed
+                // because it was not ready to accept flow
+                if (!channelsAndMolds.containsValue(neighborChannelOrMold))
+                {
+                    continue;
+                }
+
                 int y = channelsAndMolds.inverse().get(neighborChannelOrMold);
                 graph[x][y] = 1;
                 if (heuristic[x][y] == 0)
@@ -107,39 +149,60 @@ public class ChannelFlow
             }
         }
 
-        final Map<BlockPos, List<BlockPos>> paths = new HashMap<BlockPos, List<BlockPos>>();
+        //*** For each blockpos, saves the direction where flow is coming from*/
+        final Map<BlockPos, Direction> flowSource = new HashMap<>();
+
+        //*** Saves the number of paths that go through each channel */
+        final Map<BlockPos, Integer> nFlows = new HashMap<>();
 
         for (BlockPos mold : molds)
         {
-            // This is a path of BlockPos from the originChannel (the one adjacent to the crucible)
-            // to the BlockPos of the mold (not included)
-            LOGGER.debug("MoldBlock at " + mold);
-            ArrayDeque<BlockPos> path = aStar(
+            List<BlockPos> path = aStar(
                 graph, 
                 heuristic, 
                 0,
                 channelsAndMolds.inverse().get(mold)
             ).stream()
-            .map(channelsAndMolds::get) // index to BlockPos
-            .collect( // Inverts the order because the aStar returns a list goal -> start
-                Collector.of(
-                    ArrayDeque::new,
-                    (deq, t) -> deq.addFirst(t),
-                    (d1, d2) -> { d2.addAll(d1); return d2; }
-                )
-            );
-            paths.put(mold, new ArrayList<>(path));
+            .map(channelsAndMolds::get).toList(); // index to BlockPos
+            // goal (mold) to start (first channel)
 
-            for (BlockPos p : path)
+            for (int i = 0; i < path.size()-1; i++)
             {
-                LOGGER.debug("    " + p);
+                BlockPos currentChannel = path.get(i);
+                BlockPos channelSource = path.get(i+1);
+                flowSource.put(currentChannel, Direction.fromNormal(channelSource.offset( currentChannel.multiply(-1) )));
+                nFlows.put(channelSource, nFlows.getOrDefault(channelSource, 0) + 1);
             }
         }
 
-        return new ChannelFlow(paths);
+        for (BlockPos channelOrMold : flowSource.keySet())
+        {
+            level.getBlockEntity(channelOrMold, TFCCCBlockEntities.CHANNEL.get()).ifPresent(
+                channel -> channel.setLinkProperties(
+                    flowSource.get(channelOrMold),
+                    true, 
+                    nFlows.get(channelOrMold),
+                    color,
+                    texture
+                )
+            );
+            level.getBlockEntity(channelOrMold, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
+                mold -> mold.setSource(
+                    source.getBlockPos(), fluid, flowSource.get(channelOrMold)
+                )
+            );
+        }
+
+        level.getBlockEntity(originChannel, TFCCCBlockEntities.CHANNEL.get()).get().setLinkProperties(
+            Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), 
+            false, 
+            nFlows.get(originChannel), 
+            color, 
+            texture
+        );
     }
 
-    private static List<BlockPos> findAdjacent(Level level, BlockPos current, boolean findMolds)
+    private static List<BlockPos> findAdjacent(LevelAccessor level, BlockPos current, boolean findMolds)
     {
         final List<BlockPos> adjacent = new ArrayList<>();
         for (Direction dir : Direction.values())
@@ -173,7 +236,7 @@ public class ChannelFlow
      * @param heuristic an estimation of distance from node x to y that is guaranteed to be lower than the actual distance. E.g. straight-line distance
      * @param start the node to start from.
      * @param goal the node we're searching for
-     * @return The path from goal to start (not included)
+     * @return The path from goal to start, both included
      * 
      * Adapted from https://github.com/ClaasM/Algorithms/blob/master/src/a_star/java/simple/AStar.java
      * */
@@ -224,6 +287,7 @@ public class ChannelFlow
                     finalPath.add(currentIndex);
                     currentIndex = parent[currentIndex];
                 }
+                finalPath.add(start);
                 return finalPath;
             }
 
@@ -244,53 +308,5 @@ public class ChannelFlow
             // Lastly, note that we are finished with this node.
             visited[lowestPriorityIndex] = true;
         }
-    }
-
-    private Map<BlockPos, List<BlockPos>> paths;
-    
-    protected ChannelFlow(Map<BlockPos, List<BlockPos>> paths) {
-        this.paths = paths;
-    }
-
-    public Stream<MoldBlockEntity> getMolds(Level level)
-    {
-        prunePaths(level);
-        return paths.keySet().stream().map(
-            pos -> level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).get()
-        );
-    }
-
-    // Remove molds from the flow whose path is invalid 
-    // (the mold is no longer present or the channel is no longer present)
-    private void prunePaths(Level level)
-    {
-        paths.entrySet().removeIf(
-            e -> {
-                Optional<MoldBlockEntity> mold = level.getBlockEntity(e.getKey(), TFCCCBlockEntities.MOLD_TABLE.get());
-
-                // MoldBlockEntity is no longer present
-                if (mold.isEmpty()) return true; 
-
-                // MoldBlockEntity already has an output, cannot be filled more
-                if (!mold.get().getOutputStack().isEmpty()) return true;
-
-                // The path of channels has been broken
-                if (!e.getValue().stream().allMatch(
-                    ch -> level.getBlockState(ch).getBlock() instanceof ChannelBlock
-                )) return true;
-
-                return false;
-            }
-        );
-    }
-
-    public boolean isFlowFinished()
-    {
-        return paths.isEmpty();
-    }
-
-    public void removeMold(BlockPos moldPos)
-    {
-        paths.remove(moldPos);
-    }
+    }  
 }

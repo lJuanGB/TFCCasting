@@ -1,7 +1,5 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blocks;
 
-import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.LOGGER;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,7 +11,6 @@ import net.dries007.tfc.common.blocks.EntityBlockExtension;
 import net.dries007.tfc.common.blocks.ExtendedBlock;
 import net.dries007.tfc.common.blocks.ExtendedProperties;
 import net.dries007.tfc.common.capabilities.MoldLike;
-import net.dries007.tfc.util.Tooltips;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,6 +20,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -30,10 +28,10 @@ import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.fluids.FluidStack;
 
 public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
 {
@@ -51,7 +49,6 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
     {
         for (final Direction direction : Direction.Plane.HORIZONTAL)
         {
-           
             final BlockPos adjacentPos = pos.relative(direction);
             final BlockState adjacentState = level.getBlockState(adjacentPos);
             final boolean adjacentChannel = adjacentState.getBlock() instanceof ChannelBlock;
@@ -86,15 +83,6 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
             Optional<MoldBlockEntity> mold = level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get());
             if (mold.isPresent())
             {
-                LOGGER.debug("Mold at " + mold.get().getBlockPos());
-                ItemStack moldStack = mold.get().getMoldStack();
-                if (moldStack != null && MoldLike.get(moldStack) != null)
-                {
-                    FluidStack fluid = MoldLike.get(moldStack).getFluidInTank(0);
-                    LOGGER.debug("    MOLD: %s %s".formatted(moldStack.getDisplayName().getString(), Tooltips.fluidUnitsOf(fluid).getString()));
-                }
-                if (mold.get().getOutputStack() != null) LOGGER.debug("    OUTPUT: %s".formatted(mold.get().getOutputStack().getDisplayName().getString()));
-                
                 return mold.get().onRightClick(serverPlayer);
             }
         }
@@ -105,5 +93,60 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
     public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos)
     {
         return updateConnectedSides(level, pos, state);
+    }
+
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid)
+    {
+        // On destroy, notify source channel that all flows going through this
+        // channel have been broken
+        if (!level.isClientSide()) 
+        {
+            level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
+                channel -> channel.finishFlow()
+            );
+        }
+
+        return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+    }
+
+    @Override
+    public void onBlockExploded(BlockState state, Level level, BlockPos pos, Explosion explosion)
+    {
+        // On destroy, notify source channel that all flows going through this
+        // channel have been broken
+        if (!level.isClientSide()) 
+        {
+            level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
+                channel -> channel.finishFlow()
+            );
+        }
+
+        super.onBlockExploded(state, level, pos, explosion);
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState pState)
+    {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos)
+    {
+        return level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).map(
+            mold -> {
+                if (!mold.getOutputStack().isEmpty()) return 15;
+
+                ItemStack moldStack = mold.getMoldStack();
+                MoldLike moldItem = MoldLike.get(moldStack);
+                if (moldItem != null)
+                {
+                    return 1 + 13 * moldItem.getFluidInTank(0).getAmount() / moldItem.getTankCapacity(0);
+                }
+
+                return 0;
+            }
+        ).orElse(0);
     }
 }

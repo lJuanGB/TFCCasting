@@ -7,7 +7,7 @@
       "defaultRequire": 1
     },
     "mixins": [
-      "CrucibleBlockEntityMixin"
+      "CrucibleBlockMixin"
     ],
     "refmap": "tfcchannelcasting.refmap.json"
 }

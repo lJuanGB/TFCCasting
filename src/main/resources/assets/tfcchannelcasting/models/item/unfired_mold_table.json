@@ -1,0 +1,8 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "parent": "tfcchannelcasting:item/mold_table",
+  "textures": {
+    "0": "tfc:block/fire_clay_block",
+    "1": "tfc:block/fire_clay_block"
+  }
+}

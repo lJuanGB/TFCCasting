@@ -1,0 +1,5 @@
+{
+    "extend": "tfc:field_guide",
+    "name": "tfcchannelcasting field_guide extension",
+    "landing_text": "tfcchannelcasting field_guide extension"
+  }

@@ -1,0 +1,46 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "multipart": [
+    {
+      "apply": {
+        "model": "tfc:block/crucible"
+      }
+    },
+    {
+      "when": {
+        "north": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/crucible_connection",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "east": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/crucible_connection",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "south": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/crucible_connection",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": true
+      },
+      "apply": {
+        "model": "tfcchannelcasting:block/crucible_connection",
+        "y": 180
+      }
+    }
+  ]
+}
