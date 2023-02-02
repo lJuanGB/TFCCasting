@@ -2,6 +2,8 @@ package com.ljuangbminecraft.tfcchannelcasting.common.blockentities;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
@@ -19,11 +21,12 @@ public class ChannelBlockEntity extends TFCBlockEntity
         super(TFCCCBlockEntities.CHANNEL.get(), pos, state);
     }
     
-    /*** The direction where the flow is coming from 
+    /*** The direction where the flow is coming from, 
+     * as well as the distance (for downwards flow) 
      * 
      * Empty if the channel does not have a flow currently.
     */
-    private Optional<Direction> flowSource = Optional.empty();
+    private Optional<Pair<Direction, Byte>> flowSource = Optional.empty();
 
     /*** True if the flow is coming from another channel,
      * false if it's coming from a crucible.
@@ -53,7 +56,7 @@ public class ChannelBlockEntity extends TFCBlockEntity
         return fluid;
     }
 
-    public Direction getFlowSource()
+    public Pair<Direction, Byte> getFlowSource()
     {
         return flowSource.get();
     }
@@ -68,7 +71,7 @@ public class ChannelBlockEntity extends TFCBlockEntity
         return nFlows;
     }
 
-    public void setLinkProperties(Direction flowSource, boolean isConnectedToAnotherChannel, int nFlows, ResourceLocation fluid)
+    public void setLinkProperties(Pair<Direction, Byte> flowSource, boolean isConnectedToAnotherChannel, int nFlows, ResourceLocation fluid)
     {
         this.flowSource = Optional.of(flowSource);
         this.isConnectedToAnotherChannel = isConnectedToAnotherChannel;
@@ -99,7 +102,7 @@ public class ChannelBlockEntity extends TFCBlockEntity
         {
             flowSource.ifPresent(
                 fs -> level.getBlockEntity(
-                    worldPosition.relative(fs), TFCCCBlockEntities.CHANNEL.get()
+                    worldPosition.relative(fs.getLeft(), fs.getRight()), TFCCCBlockEntities.CHANNEL.get()
                 ).ifPresent(
                     channel -> channel.notifyBrokenLink(linksBroken)
                 )
@@ -129,20 +132,30 @@ public class ChannelBlockEntity extends TFCBlockEntity
         // If it's not present (the channel was broken, for example),
         // then return true (broken link). Otherwise, recursively
         // call this function for the channel block entity found.
+        // Also break if distance from source is >1 and there is no
+        // air in between
         if (isConnectedToAnotherChannel)
         {
             Optional<ChannelBlockEntity> bEntity = level.getBlockEntity(
-                worldPosition.relative(flowSource.get()), TFCCCBlockEntities.CHANNEL.get()
+                worldPosition.relative(flowSource.get().getLeft(), flowSource.get().getRight()), 
+                TFCCCBlockEntities.CHANNEL.get()
             );
 
             if (bEntity.isEmpty()) return true;
+
+            for (byte i = 1; i < flowSource.get().getRight(); i++)
+            {
+                BlockPos rel = worldPosition.relative(flowSource.get().getLeft(), i);
+                if (!level.getBlockState(rel).isAir()) return true;
+            }
 
             return bEntity.get().isLinkBroken();
         }
         else // If expecting a crucible, then set broken only if crucible is not there
         {
             Optional<CrucibleBlockEntity> bEntity = level.getBlockEntity(
-                worldPosition.relative(flowSource.get()), TFCBlockEntities.CRUCIBLE.get()
+                worldPosition.relative(flowSource.get().getLeft(), flowSource.get().getRight()), 
+                TFCBlockEntities.CRUCIBLE.get()
             );
 
             return bEntity.isEmpty();
@@ -157,7 +170,12 @@ public class ChannelBlockEntity extends TFCBlockEntity
         nFlows = nbt.getByte("nFlowsOut");
         isConnectedToAnotherChannel = nbt.getBoolean("useLongRenderBox");
         byte flowSourceByte = nbt.getByte("flowSource");
-        flowSource = flowSourceByte != NO_FLOW_BYTE ? Optional.of(Direction.values()[flowSourceByte]) : Optional.empty();
+        byte flowSourceDistance = nbt.contains("flowSourceDistance") ? nbt.getByte("flowSourceDistance") : 1;
+
+        flowSource = flowSourceByte != NO_FLOW_BYTE ? 
+            Optional.of(Pair.of(Direction.values()[flowSourceByte], flowSourceDistance)) 
+            : Optional.empty();
+        
         fluid = new ResourceLocation(nbt.getString("texture"));
     }
 
@@ -166,7 +184,8 @@ public class ChannelBlockEntity extends TFCBlockEntity
     {
         nbt.putByte("nFlowsOut", (byte) nFlows);
         nbt.putBoolean("useLongRenderBox", isConnectedToAnotherChannel);
-        nbt.putByte("flowSource", flowSource.isPresent() ? (byte) flowSource.get().ordinal() : NO_FLOW_BYTE);
+        nbt.putByte("flowSource", flowSource.isPresent() ? (byte) flowSource.get().getLeft().ordinal() : NO_FLOW_BYTE);
+        nbt.putByte("flowSourceDistance", flowSource.isPresent() ? flowSource.get().getRight() : 1);
         nbt.putString("texture", fluid.toString());
     }
 }
