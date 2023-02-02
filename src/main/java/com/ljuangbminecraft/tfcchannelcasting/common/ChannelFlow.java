@@ -24,7 +24,6 @@ import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -147,7 +146,7 @@ public class ChannelFlow
         }
 
         //*** For each blockpos, saves the direction where flow is coming from*/
-        final Map<BlockPos, Direction> flowSource = new HashMap<>();
+        final Map<BlockPos, Pair<Direction, Byte>> flowSource = new HashMap<>();
 
         //*** Saves the number of paths that go through each channel */
         final Map<BlockPos, Integer> nFlows = new HashMap<>();
@@ -167,7 +166,10 @@ public class ChannelFlow
             {
                 BlockPos currentChannel = path.get(i);
                 BlockPos channelSource = path.get(i+1);
-                flowSource.put(currentChannel, Direction.fromNormal(channelSource.offset( currentChannel.multiply(-1) )));
+                BlockPos relative = channelSource.offset( currentChannel.multiply(-1) );
+                int distance = Math.abs(relative.getX() + relative.getY() + relative.getZ());
+                BlockPos normal = new BlockPos(relative.getX()/distance, relative.getY()/distance, relative.getZ()/distance);
+                flowSource.put(currentChannel, Pair.of(Direction.fromNormal(normal), (byte) distance));
                 nFlows.put(channelSource, nFlows.getOrDefault(channelSource, 0) + 1);
             }
         }
@@ -190,7 +192,7 @@ public class ChannelFlow
         }
 
         level.getBlockEntity(originChannel, TFCCCBlockEntities.CHANNEL.get()).get().setLinkProperties(
-            Pair.of(Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), 1), 
+            Pair.of(Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), (byte) 1), 
             false, 
             nFlows.get(originChannel), 
             fluid.getRegistryName()
@@ -207,9 +209,9 @@ public class ChannelFlow
             // When going down, allow >1 block distance
             byte maxDistance = dir == Direction.DOWN ? Byte.MAX_VALUE : 1;
 
-            for (byte i = 1; i < maxDistance; i++)
+            for (byte i = 1; i < maxDistance+1; i++)
             {
-                BlockPos relative = current.relative(dir);
+                BlockPos relative = current.relative(dir, i);
                 BlockState blockState = level.getBlockState(relative);
 
                 if (findMolds && blockState.getBlock() instanceof MoldBlock)

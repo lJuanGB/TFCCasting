@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -79,15 +80,33 @@ public class ChannelBlock extends ExtendedBlock implements EntityBlockExtension
 
     private static BlockState updateConnectedSides(LevelAccessor level, BlockPos pos, BlockState state)
     {
-        for (final Direction direction : Direction.values())
+        for (Direction dir : Direction.values())
         {
-            if (direction == Direction.UP) continue;
+            if (dir == Direction.UP) continue;
 
-            final BlockPos adjacentPos = pos.relative(direction);
-            final BlockState adjacentState = level.getBlockState(adjacentPos);
-            final Block adjancentBlock = adjacentState.getBlock();
-            final boolean isAdjacentConnectable = adjancentBlock instanceof ChannelBlock || adjancentBlock instanceof CrucibleBlock || adjancentBlock instanceof MoldBlock;
-            state = state.setValue(DirectionPropertyBlock.getProperty(direction), isAdjacentConnectable);
+            // When going down, allow >1 block distance
+            byte maxDistance = dir == Direction.DOWN ? Byte.MAX_VALUE : 1;
+
+            boolean isAdjacentConnectable = false;
+
+            for (byte i = 1; i < maxDistance+1; i++)
+            {
+                BlockPos relative = pos.relative(dir, i);
+                BlockState blockState = level.getBlockState(relative);
+                Block block = blockState.getBlock();
+
+                if (block instanceof ChannelBlock || block instanceof CrucibleBlock || block instanceof MoldBlock)
+                {
+                    isAdjacentConnectable = true;
+                    break;
+                }
+                else if (!blockState.isAir())
+                {
+                    break;
+                }
+            }
+
+            state = state.setValue(DirectionPropertyBlock.getProperty(dir), isAdjacentConnectable);
         }
 
         return state;

@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 public class ChannelBlockEntity extends TFCBlockEntity
 {
@@ -187,5 +188,25 @@ public class ChannelBlockEntity extends TFCBlockEntity
         nbt.putByte("flowSource", flowSource.isPresent() ? (byte) flowSource.get().getLeft().ordinal() : NO_FLOW_BYTE);
         nbt.putByte("flowSourceDistance", flowSource.isPresent() ? flowSource.get().getRight() : 1);
         nbt.putString("texture", fluid.toString());
+    }
+
+    @Override
+    public AABB getRenderBoundingBox()
+    {
+        if (this.flowSource.isPresent())
+        {
+            if (this.flowSource.get().getLeft() == Direction.UP)
+            {
+                return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 1+this.flowSource.get().getRight(), 2));
+            }
+            else
+            {
+                return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 2, 2));
+            }
+        }
+        else
+        {
+            return super.getRenderBoundingBox();
+        }
     }
 }

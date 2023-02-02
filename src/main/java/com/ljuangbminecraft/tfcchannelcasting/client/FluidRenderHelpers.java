@@ -1,5 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
@@ -9,6 +11,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /*
@@ -55,10 +58,12 @@ public class FluidRenderHelpers
             .endVertex();
     }
 
-    public static void renderFlow(PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int packedLight, int packedOverlay, Direction dir, boolean renderFlowSource)
+    public static void renderFlow(PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int packedLight, int packedOverlay, Pair<Direction, Byte> source, boolean renderFlowSource)
     {
         poseStack.pushPose();
         poseStack.translate(0.5, 0, 0.5); // Center so that rotation gets applied correctly
+
+        Direction dir = source.getLeft();
 
         VoxelShape renderBox;
         switch (dir)
@@ -77,9 +82,29 @@ public class FluidRenderHelpers
             default:
                 throw new IllegalArgumentException("Cannot render source from direction DOWN");
         }
-        poseStack.translate(-0.5, 0, -0.5); // Undo translation
 
+        poseStack.translate(-0.5, 0, -0.5); // Undo translation
         FluidRenderHelpers.renderTexturedCuboid(poseStack, buffer, sprite, color, packedLight, packedOverlay, renderBox.bounds());
+        poseStack.popPose();
+
+        // Render flow drops of > 1 distance
+        poseStack.pushPose();
+        for (int offset = 1; offset < source.getRight(); offset++)
+        {
+            poseStack.translate(0, 1, 0);
+            switch (dir)
+            {
+                case UP:
+                    FluidRenderHelpers.renderTexturedCuboid(
+                        poseStack, buffer, sprite, color, packedLight, packedOverlay, 
+                        Block.box(6.0f,  0.0f, 6.0f,  10.0f, 16.0f, 10.0f).bounds()
+                    );
+                    break;
+                default:
+                    throw new IllegalArgumentException("Cannot render source from direction other than UP with source > 1 distance");
+            }
+            
+        }
         poseStack.popPose();
     }
 

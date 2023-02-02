@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
@@ -34,6 +35,10 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
             TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(texture);
 
             FluidRenderHelpers.renderFlow(poseStack, builder, sprite, color, combinedLight, combinedOverlay, mold.getFlowSource(), true);
+            if (mold.getFlowSource().getLeft() == Direction.UP)
+            {
+                FluidRenderHelpers.renderFlowCenter(poseStack, builder, sprite, color, combinedLight, combinedOverlay);
+            }
         }
         
         ItemStack moldStack = mold.getMoldStack();

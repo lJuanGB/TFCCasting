@@ -39,6 +39,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -140,11 +141,12 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
     */
     private Optional<BlockPos> sourcePosition = Optional.empty();
 
-    /*** The direction where the flow is coming from 
+    /*** The direction where the flow is coming from, 
+     * as well as the distance (for downwards flow) 
      * 
-     * Empty if the mold table does not have a flow currently
+     * Empty if the channel does not have a flow currently.
     */
-    private Optional<Direction> flowSource = Optional.empty();
+    private Optional<Pair<Direction, Byte>> flowSource = Optional.empty();
 
     /*** The fluid to expect from the crucible. Flow should finish
      * if the fluid from the crucible is different than this value. 
@@ -186,7 +188,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         flowSource.ifPresent(
             fSource -> {
                 level.getBlockEntity(
-                    worldPosition.relative(fSource), TFCCCBlockEntities.CHANNEL.get()
+                    worldPosition.relative(fSource.getLeft(), fSource.getRight()), TFCCCBlockEntities.CHANNEL.get()
                 ).ifPresent(
                     channel -> channel.notifyBrokenLink(1)
                 );
@@ -199,7 +201,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         );
     }
 
-    public void setSource(BlockPos sourcePos, Fluid fluid, Direction flowSource)
+    public void setSource(BlockPos sourcePos, Fluid fluid, Pair<Direction, Byte> flowSource)
     {
         this.sourcePosition = Optional.of(sourcePos);
         this.fluid = Optional.of(fluid);
@@ -209,10 +211,19 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
     public boolean isLinkBroken()
     {
         Optional<ChannelBlockEntity> bEntity = level.getBlockEntity(
-            worldPosition.relative(flowSource.get()), TFCCCBlockEntities.CHANNEL.get()
+            worldPosition.relative(flowSource.get().getLeft(), flowSource.get().getRight()), 
+            TFCCCBlockEntities.CHANNEL.get()
         );
 
         if (bEntity.isEmpty()) return true;
+
+        for (byte i = 1; i < flowSource.get().getRight(); i++)
+        {
+            BlockPos rel = worldPosition.relative(flowSource.get().getLeft(), i);
+            if (!level.getBlockState(rel).isAir()) {
+                return true;
+            }
+        }
 
         return bEntity.get().isLinkBroken();
     }
@@ -222,7 +233,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         return fluid.get();
     }
 
-    public Direction getFlowSource() {
+    public Pair<Direction, Byte> getFlowSource() {
         return flowSource.get();
     }
 
@@ -330,7 +341,12 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         if (nbt.contains("sourcePosition"))
         {
             sourcePosition = Optional.of(BlockPos.of( nbt.getLong("sourcePosition") ));
-            flowSource = Optional.of(Direction.values()[nbt.getByte("flowSource")]);
+            flowSource = Optional.of(
+                Pair.of(
+                    Direction.values()[nbt.getByte("flowSource")], 
+                    nbt.contains("flowSourceDistance") ? nbt.getByte("flowSourceDistance") : 1
+                )
+            );
             fluid = Optional.of(ForgeRegistries.FLUIDS.getValue( new ResourceLocation(nbt.getString("fluid")) ));
         }
         else
@@ -348,7 +364,8 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         if (hasSource())
         {
             nbt.putLong("sourcePosition", sourcePosition.get().asLong());
-            nbt.putByte("flowSource", (byte) flowSource.get().ordinal());
+            nbt.putByte("flowSource", (byte) flowSource.get().getLeft().ordinal());
+            nbt.putByte("flowSourceDistance", flowSource.get().getRight());
             nbt.putString("fluid", fluid.get().getRegistryName().toString());
         }
         super.saveAdditional(nbt);
@@ -377,6 +394,26 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         sidedHeatInventory.invalidate();
     }
 
+    @Override
+    public AABB getRenderBoundingBox()
+    {
+        if (this.flowSource.isPresent())
+        {
+            if (this.flowSource.get().getLeft() == Direction.UP)
+            {
+                return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 1+this.flowSource.get().getRight(), 2));
+            }
+            else
+            {
+                return new AABB(worldPosition.offset(-1, 0, -1), worldPosition.offset(2, 2, 2));
+            }
+        }
+        else
+        {
+            return super.getRenderBoundingBox();
+        }
+    }
+    
     // This inventory delegates the fluid and heat handler to the
     // item in the mold stack, as long as this item has the
     // corresponding capabilities (i.e. a mold item is present).
