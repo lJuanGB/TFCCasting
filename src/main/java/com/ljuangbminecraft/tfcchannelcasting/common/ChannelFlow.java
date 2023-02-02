@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
@@ -23,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -187,7 +190,7 @@ public class ChannelFlow
         }
 
         level.getBlockEntity(originChannel, TFCCCBlockEntities.CHANNEL.get()).get().setLinkProperties(
-            Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), 
+            Pair.of(Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), 1), 
             false, 
             nFlows.get(originChannel), 
             fluid.getRegistryName()
@@ -201,23 +204,29 @@ public class ChannelFlow
         {
             if (dir == Direction.UP) continue;
 
-            BlockPos relative = current.relative(dir);
-            Block block = level.getBlockState(relative).getBlock();
-            if (findMolds)
+            // When going down, allow >1 block distance
+            byte maxDistance = dir == Direction.DOWN ? Byte.MAX_VALUE : 1;
+
+            for (byte i = 1; i < maxDistance; i++)
             {
-                if (block instanceof MoldBlock)
+                BlockPos relative = current.relative(dir);
+                BlockState blockState = level.getBlockState(relative);
+
+                if (findMolds && blockState.getBlock() instanceof MoldBlock)
                 {
                     adjacent.add(relative);
+                    break;
                 }
-            }
-            else
-            {
-                if (block instanceof ChannelBlock)
+                else if (!findMolds && blockState.getBlock() instanceof ChannelBlock)
                 {
                     adjacent.add(relative);
+                    break;
+                }
+                else if (!blockState.isAir())
+                {
+                    break;
                 }
             }
-            
         }
         return adjacent;
     }

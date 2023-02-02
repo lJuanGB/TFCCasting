@@ -154,7 +154,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
     private Optional<Fluid> fluid = Optional.empty();
 
     private final SidedHandler.Builder<IFluidHandler> sidedFluidInventory;
-    private final SidedHandler.Builder<IHeat> sidedHeatInventory;
+    private final SidedHandler.Builder<IHeatBlock> sidedHeatInventory;
 
     public static final int MOLD_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
@@ -383,7 +383,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
     // If it does not have them, it implements some default behaviour
     // for every method.
     // Moreover, it adds some custom behaviour for fill
-    static class MoldBlockInventory extends ItemStackHandler implements IFluidHandler, IHeat
+    static class MoldBlockInventory extends ItemStackHandler implements IFluidHandler, IHeatBlock
     {
         private final MoldBlockEntity moldTable;
 
@@ -407,11 +407,6 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         private Optional<IHeat> getMoldHeatHandler()
         {
             return moldTable.getMoldStack().getCapability(HeatCapability.CAPABILITY).map(t -> t);
-        }
-
-        @Override
-        public float getHeatCapacity() {
-            return getMoldHeatHandler().map(h -> h.getHeatCapacity()).orElse(0f);
         }
 
         @Override
