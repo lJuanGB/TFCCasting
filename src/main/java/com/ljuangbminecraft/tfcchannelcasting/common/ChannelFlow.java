@@ -20,14 +20,16 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
 
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
-import net.dries007.tfc.util.Helpers;
+import net.dries007.tfc.common.capabilities.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class ChannelFlow 
 {
@@ -94,8 +96,7 @@ public class ChannelFlow
                 if (!moldEnt.get().getOutputStack().isEmpty()) return true;
 
                 final FluidStack outputDrop = iFldHandler.get().drain(1, IFluidHandler.FluidAction.SIMULATE);
-                final FluidStack outputRemainder = Helpers.mergeOutputFluidIntoSlot(moldEnt.get().getInventory(), outputDrop, source.getTemperature(), MoldBlockEntity.MOLD_SLOT);
-                return !outputRemainder.isEmpty();
+                return !couldBeFilled(moldEnt.get().getInventory(), outputDrop, MoldBlockEntity.MOLD_SLOT);
             }
         );
 
@@ -312,4 +313,17 @@ public class ChannelFlow
             visited[lowestPriorityIndex] = true;
         }
     }  
+
+    public static boolean couldBeFilled(IItemHandlerModifiable inventory, FluidStack fluidStack, int slot)
+    {
+        if (!fluidStack.isEmpty())
+        {
+            final ItemStack mergeStack = inventory.getStackInSlot(slot);
+            return mergeStack.getCapability(Capabilities.FLUID).map(fluidCap -> {
+                int filled = fluidCap.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE);
+                return filled > 0;
+            }).orElse(false);
+        }
+        return false;
+    }
 }
