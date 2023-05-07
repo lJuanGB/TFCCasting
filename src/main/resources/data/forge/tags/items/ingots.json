@@ -1,0 +1,9 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "#forge:ingots/dark_chocolate",
+    "#forge:ingots/milk_chocolate",
+    "#forge:ingots/white_chocolate"
+  ]
+}

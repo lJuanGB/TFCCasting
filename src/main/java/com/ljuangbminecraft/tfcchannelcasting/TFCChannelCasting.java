@@ -8,6 +8,7 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEnt
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCBlocks;
+import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCItems;
 import com.mojang.logging.LogUtils;
 
@@ -42,6 +43,7 @@ public class TFCChannelCasting {
         TFCCCBlocks.BLOCKS.register(bus);
         TFCCCBlockEntities.BLOCK_ENTITIES.register(bus);
         TFCCCItems.ITEMS.register(bus);
+        TFCCCFluids.FLUIDS.register(bus);
 
         bus.addListener(this::setup);
 

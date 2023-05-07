@@ -1,0 +1,13 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "tier": 0,
+  "fluid": "tfcchannelcasting:white_chocolate",
+  "melt_temperature": 300,
+  "specific_heat_capacity": 0.00375,
+  "ingots": {
+    "tag": "forge:ingots/white_chocolate"
+  },
+  "sheets": {
+    "tag": "forge:sheets/white_chocolate"
+  }
+}

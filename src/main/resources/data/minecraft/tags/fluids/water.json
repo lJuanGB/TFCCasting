@@ -1,0 +1,12 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "tfcchannelcasting:dark_chocolate",
+    "tfcchannelcasting:flowing_dark_chocolate",
+    "tfcchannelcasting:milk_chocolate",
+    "tfcchannelcasting:flowing_milk_chocolate",
+    "tfcchannelcasting:white_chocolate",
+    "tfcchannelcasting:flowing_white_chocolate"
+  ]
+}

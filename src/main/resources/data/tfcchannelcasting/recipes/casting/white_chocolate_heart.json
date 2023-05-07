@@ -1,0 +1,15 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:casting",
+  "mold": {
+    "item": "tfcchannelcasting:heart_mold"
+  },
+  "fluid": {
+    "ingredient": "tfcchannelcasting:white_chocolate",
+    "amount": 100
+  },
+  "result": {
+    "item": "tfcchannelcasting:food/white_chocolate_heart"
+  },
+  "break_chance": 0
+}
