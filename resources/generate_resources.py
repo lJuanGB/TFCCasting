@@ -42,6 +42,7 @@ MOLDS = (
     "MACE_HEAD",
     "KNIFE_BLADE",
     "SCYTHE_BLADE",
+    "FIRE_INGOT",
 )
 LANG = ("en_US", )
 

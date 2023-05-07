@@ -1,10 +1,12 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.items;
 
+import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.LOGGER;
 import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
 import static net.dries007.tfc.common.TFCItemGroup.MISC;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +41,7 @@ public class TFCCCItems
         registerRenderItem("tfc:ceramic/mace_head_mold", register("mold/mace_head"));
         registerRenderItem("tfc:ceramic/knife_blade_mold", register("mold/knife_blade"));
         registerRenderItem("tfc:ceramic/scythe_blade_mold", register("mold/scythe_blade"));
+        registerRenderItem("tfc:ceramic/fire_ingot_mold", register("mold/fire_ingot"));
     }
 
     /*** Register the item that should be used to render a ceramic mold
@@ -58,13 +61,14 @@ public class TFCCCItems
         registerRenderItem(new ResourceLocation(loc), item);
     }
 
-    public static RegistryObject<Item> getRenderItem(ResourceLocation loc)
+    public static Optional<RegistryObject<Item>> getRenderItem(ResourceLocation loc)
     {
         if (!moldStackToRenderItem.containsKey(loc))
         {
-            throw new IllegalArgumentException("Cannot render %s because no render item is registered!".formatted(loc.toString()));
+            LOGGER.warn("Cannot render %s because no render item is registered!".formatted(loc.toString()));
+            return Optional.empty();
         }
-        return moldStackToRenderItem.get(loc);
+        return Optional.of(moldStackToRenderItem.get(loc));
     }
 
     private static RegistryObject<Item> register(String name)

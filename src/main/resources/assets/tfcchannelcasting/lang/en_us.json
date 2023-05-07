@@ -16,6 +16,7 @@
   "item.tfcchannelcasting.mold.mace_head": "MACE_HEAD Render Item",
   "item.tfcchannelcasting.mold.knife_blade": "KNIFE_BLADE Render Item",
   "item.tfcchannelcasting.mold.scythe_blade": "SCYTHE_BLADE Render Item",
+  "item.tfcchannelcasting.mold.fire_ingot": "FIRE_INGOT Render Item",
   "item.tfcchannelcasting.unfired_channel": "Unfired Casting Channel",
   "item.tfcchannelcasting.unfired_mold_table": "Unfired Mold Table"
 }

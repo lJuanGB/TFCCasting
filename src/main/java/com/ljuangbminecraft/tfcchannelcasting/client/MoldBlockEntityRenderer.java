@@ -89,8 +89,12 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
             // Render the mold
             poseStack.pushPose();
             poseStack.translate(0.5, 0.5, 0.5);
-            ItemStack moldRenderStack = TFCCCItems.getRenderItem(moldStack.getItem().getRegistryName()).get().getDefaultInstance();
-            Minecraft.getInstance().getItemRenderer().renderStatic(moldRenderStack, ItemTransforms.TransformType.FIXED, combinedLight, combinedOverlay, poseStack, buffer, 0);
+            TFCCCItems.getRenderItem(moldStack.getItem().getRegistryName()).ifPresent(
+                (item) -> {
+                    ItemStack moldRenderStack = item.get().getDefaultInstance();
+                    Minecraft.getInstance().getItemRenderer().renderStatic(moldRenderStack, ItemTransforms.TransformType.FIXED, combinedLight, combinedOverlay, poseStack, buffer, 0);
+                }
+            );
             poseStack.popPose();
         }        
     }
