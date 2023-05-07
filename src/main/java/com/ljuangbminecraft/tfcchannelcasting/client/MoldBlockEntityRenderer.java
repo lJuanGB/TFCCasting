@@ -1,5 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
+import java.util.Optional;
+
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCItems;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -47,7 +49,7 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
         {
             FluidStack fluidInTank = moldItem.getFluidInTank(0);
 
-            float fillPercent = 0;
+            final float fillPercent;
             if (mold.getOutputStack().isEmpty())
             {
                 fillPercent = ((float) fluidInTank.getAmount()) / moldItem.getTankCapacity(0);
@@ -59,31 +61,39 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
 
             if (fillPercent > 0)
             {
-                Metal metal;
+                Optional<Metal> optMetal;
                 if (mold.getOutputStack().isEmpty())
                 {
-                    metal = Metal.get(fluidInTank.getFluid());
+                    optMetal = Optional.of(Metal.get(fluidInTank.getFluid()));
                 }
                 else
                 {
+                    // It is possible that the output stack
+                    // does not have a heating recipe, in which case
+                    // we cannot render anything :(
                     HeatingRecipe recipe = HeatingRecipe.getRecipe(mold.getOutputStack());
-                    metal = Metal.get(recipe.getDisplayOutputFluid().getFluid());
+                    optMetal = Optional.ofNullable( recipe == null ? null : Metal.get(recipe.getDisplayOutputFluid().getFluid()));
                 }
 
+                optMetal.ifPresent(
+                    metal -> {
+                        if (moldItem.getTemperature() < metal.getMeltTemperature())
+                        {
+                            TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(metal.getTextureId());
+
+                            RenderHelpers.renderTexturedQuads(
+                                poseStack, builder, sprite, combinedLight, combinedOverlay, 
+                                RenderHelpers.getYVertices(2f / 16, 1f / 16, 2f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, 14f / 16), 
+                                16f * (14f / 16 - 2f / 16), 16f * (14f / 16 - 2f / 16), 0, 0, 1);
+                        }
+                        else // fluid
+                        {
+                            RenderHelpers.renderFluidFace(poseStack, fluidInTank, buffer, 2f / 16, 2f / 16, 14f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, combinedOverlay, combinedLight);
+                        }
+                    }
+                );
                 // Solid!
-                if (moldItem.getTemperature() < metal.getMeltTemperature())
-                {
-                    TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(metal.getTextureId());
-
-                    RenderHelpers.renderTexturedQuads(
-                        poseStack, builder, sprite, combinedLight, combinedOverlay, 
-                        RenderHelpers.getYVertices(2f / 16, 1f / 16, 2f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, 14f / 16), 
-                        16f * (14f / 16 - 2f / 16), 16f * (14f / 16 - 2f / 16), 0, 0, 1);
-                }
-                else // fluid
-                {
-                    RenderHelpers.renderFluidFace(poseStack, fluidInTank, buffer, 2f / 16, 2f / 16, 14f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, combinedOverlay, combinedLight);
-                }
+                
             }
 
             // Render the mold

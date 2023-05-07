@@ -2,31 +2,66 @@ package com.ljuangbminecraft.tfcchannelcasting.common.items;
 
 import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.LOGGER;
 import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
+import static net.dries007.tfc.common.TFCItemGroup.FOOD;
 import static net.dries007.tfc.common.TFCItemGroup.MISC;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Map;
 import java.util.function.Supplier;
 
+import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
+import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ExtraFluid;
+import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
+
+import net.dries007.tfc.common.items.DecayingItem;
+import net.dries007.tfc.common.items.MoldItem;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class TFCCCItems 
-{
+public class TFCCCItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
-    public static final RegistryObject<Item> UNFIRED_CHANNEL    = register("unfired_channel",    MISC);
+    public static final RegistryObject<Item> UNFIRED_CHANNEL = register("unfired_channel", MISC);
     public static final RegistryObject<Item> UNFIRED_MOLD_TABLE = register("unfired_mold_table", MISC);
+
+    public static final RegistryObject<Item> UNFIRED_HEART_MOLD = register("unfired_heart_mold", MISC);
+    public static final RegistryObject<Item> HEART_MOLD = register("heart_mold",
+            () -> new MoldItem(() -> 100, TFCCCTags.Fluids.USABLE_IN_HEART_MOLD, new Item.Properties().tab(MISC)));
+
+    public static final Map<ExtraFluid, RegistryObject<BucketItem>> EXTRA_FLUID_BUCKETS = Helpers.mapOfKeys(
+            ExtraFluid.class,
+            fluid -> register("bucket/" + fluid.getSerializedName(),
+                    () -> new BucketItem(TFCCCFluids.EXTRA_FLUIDS.get(fluid).source(),
+                            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(MISC))));
+
+    public static final RegistryObject<Item> WHITE_CHOCOLATE_HEART = register(
+            "food/white_chocolate_heart",
+            () -> new DecayingItem(new Item.Properties()
+                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
+
+    public static final RegistryObject<Item> MILK_CHOCOLATE_HEART = register(
+            "food/milk_chocolate_heart",
+            () -> new DecayingItem(new Item.Properties()
+                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
+
+    public static final RegistryObject<Item> DARK_CHOCOLATE_HEART = register(
+            "food/dark_chocolate_heart",
+            () -> new DecayingItem(new Item.Properties()
+                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
 
     private static final HashMap<ResourceLocation, RegistryObject<Item>> moldStackToRenderItem = new HashMap<>();
 
-    static
-    {
+    static {
         registerRenderItem("tfc:ceramic/ingot_mold", register("mold/ingot"));
         registerRenderItem("tfc:ceramic/pickaxe_head_mold", register("mold/pickaxe_head"));
         registerRenderItem("tfc:ceramic/propick_head_mold", register("mold/propick_head"));
@@ -42,47 +77,42 @@ public class TFCCCItems
         registerRenderItem("tfc:ceramic/knife_blade_mold", register("mold/knife_blade"));
         registerRenderItem("tfc:ceramic/scythe_blade_mold", register("mold/scythe_blade"));
         registerRenderItem("tfc:ceramic/fire_ingot_mold", register("mold/fire_ingot"));
+        registerRenderItem("tfcchannelcasting:heart_mold", register("mold/heart"));
     }
 
-    /*** Register the item that should be used to render a ceramic mold
+    /***
+     * Register the item that should be used to render a ceramic mold
      * in the mold table.
      * 
-     * @param loc the registry name of the item for which a render
-     *  is being registered (for example, "tfc:ceramic/ingot_mold")
+     * @param loc  the registry name of the item for which a render
+     *             is being registered (for example, "tfc:ceramic/ingot_mold")
      * @param item the item that should be used to render the mold
      */
-    public static void registerRenderItem(ResourceLocation loc, RegistryObject<Item> item)
-    {
+    public static void registerRenderItem(ResourceLocation loc, RegistryObject<Item> item) {
         moldStackToRenderItem.put(loc, item);
     }
 
-    private static void registerRenderItem(String loc, RegistryObject<Item> item)
-    {
+    private static void registerRenderItem(String loc, RegistryObject<Item> item) {
         registerRenderItem(new ResourceLocation(loc), item);
     }
 
-    public static Optional<RegistryObject<Item>> getRenderItem(ResourceLocation loc)
-    {
-        if (!moldStackToRenderItem.containsKey(loc))
-        {
+    public static Optional<RegistryObject<Item>> getRenderItem(ResourceLocation loc) {
+        if (!moldStackToRenderItem.containsKey(loc)) {
             LOGGER.warn("Cannot render %s because no render item is registered!".formatted(loc.toString()));
             return Optional.empty();
         }
         return Optional.of(moldStackToRenderItem.get(loc));
     }
 
-    private static RegistryObject<Item> register(String name)
-    {
+    private static RegistryObject<Item> register(String name) {
         return register(name, () -> new Item(new Item.Properties()));
     }
 
-    private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item)
-    {
+    private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item) {
         return ITEMS.register(name.toLowerCase(Locale.ROOT), item);
     }
 
-    private static RegistryObject<Item> register(String name, CreativeModeTab group)
-    {
+    private static RegistryObject<Item> register(String name, CreativeModeTab group) {
         return register(name, () -> new Item(new Item.Properties().tab(group)));
     }
 }
