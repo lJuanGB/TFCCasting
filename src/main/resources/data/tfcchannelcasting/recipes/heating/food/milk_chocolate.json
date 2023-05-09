@@ -7,6 +7,9 @@
       "item": "firmalife:food/milk_chocolate"
     }
   },
-  "temperature": 300,
-  "use_durability": "100 tfcchannelcasting:milk_chocolate"
+  "result_fluid": {
+    "fluid": "tfcchannelcasting:milk_chocolate",
+    "amount": 100
+  },
+  "temperature": 300
 }

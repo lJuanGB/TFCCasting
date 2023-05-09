@@ -7,6 +7,9 @@
       "item": "tfcchannelcasting:food/white_chocolate_heart"
     }
   },
-  "temperature": 300,
-  "use_durability": "100 tfcchannelcasting:white_chocolate"
+  "result_fluid": {
+    "fluid": "tfcchannelcasting:white_chocolate",
+    "amount": 100
+  },
+  "temperature": 300
 }

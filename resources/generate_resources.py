@@ -285,30 +285,6 @@ def fluid_stack(data_in: Json) -> Json:
     return {"fluid": fluid, "amount": amount}
 
 
-def heat_recipe(
-    rm: ResourceManager,
-    name_parts: utils.ResourceIdentifier,
-    ingredient: utils.Json,
-    temperature: float,
-    result_item: Optional[Union[str, Json]],
-    result_fluid: Optional[str] = None,
-) -> RecipeContext:
-    result_item = (
-        utils.item_stack(result_item) if isinstance(result_item, str) else result_item
-    )
-    result_fluid = None if result_fluid is None else fluid_stack(result_fluid)
-    return rm.recipe(
-        ("heating", name_parts),
-        "tfc:heating",
-        {
-            "ingredient": utils.ingredient(ingredient),
-            "result_item": result_item,
-            "result_fluid": result_fluid,
-            "temperature": temperature,
-        },
-    )
-
-
 def knapping_recipe(
     rm: ResourceManager,
     knapping_type: str,
@@ -330,21 +306,24 @@ def knapping_recipe(
 
 def heat_recipe(
     rm: ResourceManager,
-    name_parts,
-    ingredient,
+    name_parts: utils.ResourceIdentifier,
+    ingredient: utils.Json,
     temperature: float,
     result_item: Optional[Union[str, Json]] = None,
+    result_fluid: Optional[str] = None,
     use_durability: Optional[bool] = None,
 ) -> RecipeContext:
     result_item = (
         utils.item_stack(result_item) if isinstance(result_item, str) else result_item
     )
+    result_fluid = None if result_fluid is None else fluid_stack(result_fluid)
     return rm.recipe(
         ("heating", name_parts),
         "tfc:heating",
         {
             "ingredient": utils.ingredient(ingredient),
             "result_item": result_item,
+            "result_fluid": result_fluid,
             "temperature": temperature,
             "use_durability": use_durability if use_durability else None,
         },
