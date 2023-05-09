@@ -7,6 +7,9 @@
       "item": "firmalife:food/dark_chocolate"
     }
   },
-  "temperature": 300,
-  "use_durability": "100 tfcchannelcasting:dark_chocolate"
+  "result_fluid": {
+    "fluid": "tfcchannelcasting:dark_chocolate",
+    "amount": 100
+  },
+  "temperature": 300
 }
