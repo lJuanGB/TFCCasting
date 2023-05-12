@@ -51,8 +51,14 @@ A mod to add casting through channels for the crucible.
 [[dependencies.tfcchannelcasting]]
     modId="tfc"
     mandatory=true
-    versionRange="[2.1.0-beta,)"
-    ordering="BEFORE"
+    versionRange="[2.2.20,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.tfcchannelcasting]]
+    modId="firmalife"
+    mandatory=false
+    versionRange="[1.2.0-beta,)"
+    ordering="AFTER"
     side="BOTH"
 [[dependencies.tfcchannelcasting]]
     modId="minecraft"

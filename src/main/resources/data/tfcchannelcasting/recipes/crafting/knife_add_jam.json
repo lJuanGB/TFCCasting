@@ -1,0 +1,91 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:advanced_shapeless_crafting",
+  "ingredients": [
+    {
+      "type": "tfc:lacks_trait",
+      "trait": "tfcchannelcasting:filled_with_jam",
+      "ingredient": {
+        "type": "tfc:lacks_trait",
+        "trait": "tfcchannelcasting:filled_with_sweet_liquor",
+        "ingredient": {
+          "type": "tfc:lacks_trait",
+          "trait": "tfcchannelcasting:filled_with_strong_liquor",
+          "ingredient": {
+            "type": "tfc:lacks_trait",
+            "trait": "tfcchannelcasting:filled_with_whiskey",
+            "ingredient": {
+              "tag": "tfcchannelcasting:foods/chocolate_knife"
+            }
+          }
+        }
+      }
+    },
+    {
+      "tag": "firmalife:foods/preserves"
+    }
+  ],
+  "result": {
+    "modifiers": [
+      "tfc:copy_input",
+      {
+        "type": "tfcchannelcasting:conditional",
+        "condition": {
+          "type": "tfcchannelcasting:has_trait",
+          "trait": "tfcchannelcasting:scary"
+        },
+        "modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 1,
+            "dairy": 1,
+            "fruit": 0.75
+          }
+        ],
+        "else_modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 0.5,
+            "dairy": 0.5,
+            "fruit": 0.75
+          }
+        ]
+      },
+      {
+        "type": "tfc:add_trait",
+        "trait": "tfcchannelcasting:filled_with_jam"
+      }
+    ]
+  },
+  "primary_ingredient": {
+    "type": "tfc:lacks_trait",
+    "trait": "tfcchannelcasting:filled_with_jam",
+    "ingredient": {
+      "type": "tfc:lacks_trait",
+      "trait": "tfcchannelcasting:filled_with_sweet_liquor",
+      "ingredient": {
+        "type": "tfc:lacks_trait",
+        "trait": "tfcchannelcasting:filled_with_strong_liquor",
+        "ingredient": {
+          "type": "tfc:lacks_trait",
+          "trait": "tfcchannelcasting:filled_with_whiskey",
+          "ingredient": {
+            "tag": "tfcchannelcasting:foods/chocolate_knife"
+          }
+        }
+      }
+    }
+  },
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "firmalife"
+    }
+  ]
+}

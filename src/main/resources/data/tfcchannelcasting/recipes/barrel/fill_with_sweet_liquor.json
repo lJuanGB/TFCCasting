@@ -1,0 +1,41 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:barrel_sealed",
+  "input_item": {
+    "ingredient": {
+      "type": "tfc:lacks_trait",
+      "trait": "tfcchannelcasting:filled_with_jam",
+      "ingredient": {
+        "type": "tfc:lacks_trait",
+        "trait": "tfcchannelcasting:filled_with_sweet_liquor",
+        "ingredient": {
+          "type": "tfc:lacks_trait",
+          "trait": "tfcchannelcasting:filled_with_strong_liquor",
+          "ingredient": {
+            "type": "tfc:lacks_trait",
+            "trait": "tfcchannelcasting:filled_with_whiskey",
+            "ingredient": {
+              "tag": "tfcchannelcasting:foods/chocolate_sweet"
+            }
+          }
+        }
+      }
+    }
+  },
+  "input_fluid": {
+    "ingredient": {
+      "tag": "tfcchannelcasting:sweet_liquor"
+    },
+    "amount": 250
+  },
+  "output_item": {
+    "modifiers": [
+      "tfc:copy_input",
+      {
+        "type": "tfc:add_trait",
+        "trait": "tfcchannelcasting:filled_with_sweet_liquor"
+      }
+    ]
+  },
+  "duration": 24000
+}

@@ -70,6 +70,7 @@ MOLDS = (
     "KNIFE_BLADE",
     "SCYTHE_BLADE",
     "FIRE_INGOT",
+    "BELL",
 )
 
 CUSTOM_MOLDS = ("HEART",)
@@ -81,6 +82,26 @@ CHOCOLATES_METALS = {
 }
 
 LANG = ("en_US",)
+
+NORMAL_CHOCOLATE_FOOD_DATA = {
+    "hunger": 4,
+    "saturation": 1,
+    "decay_modifier": 0.3,
+    "grain": 0.5,
+    "dairy": 0.5,
+}
+
+SPECIAL_CHOCOLATE_FOOD_DATA = {
+    "hunger": 4,
+    "saturation": 1,
+    "decay_modifier": 0.3,
+    "grain": 1,
+    "dairy": 1,
+}
+
+JAM_CHOCOLATE_FOOD_DATA = {"fruit": 0.75}
+
+FIRMALIFE_CONDITIONS = [{"type": "forge:mod_loaded", "modid": "firmalife"}]
 
 
 def not_rotten(ingredient: Json) -> Json:
@@ -201,8 +222,9 @@ def casting_recipe(
     mold: str,
     metal: str,
     amount: int,
-    result: str,
+    result: Json,
     break_chance: float,
+    conditions: Json = None,
 ):
     rm.recipe(
         ("casting", name_parts),
@@ -215,7 +237,102 @@ def casting_recipe(
             "result": utils.item_stack(result),
             "break_chance": break_chance,
         },
+        conditions=conditions,
     )
+
+
+def advanced_shapeless(
+    rm: ResourceManager,
+    name_parts: utils.ResourceIdentifier,
+    ingredients: Json,
+    result: Json,
+    primary_ingredient: Json = None,
+    group: Optional[str] = None,
+    conditions: Optional[Json] = None,
+) -> RecipeContext:
+    res = utils.resource_location(rm.domain, name_parts)
+    rm.write(
+        (*rm.resource_dir, "data", res.domain, "recipes", res.path),
+        {
+            "type": "tfc:advanced_shapeless_crafting",
+            "group": group,
+            "ingredients": utils.item_stack_list(ingredients),
+            "result": result,
+            "primary_ingredient": None
+            if primary_ingredient is None
+            else utils.ingredient(primary_ingredient),
+            "conditions": utils.recipe_condition(conditions),
+        },
+    )
+    return RecipeContext(rm, res)
+
+
+def barrel_sealed_recipe(
+    rm: ResourceManager,
+    name_parts: utils.ResourceIdentifier,
+    translation: str,
+    duration: int,
+    input_item: Optional[Json] = None,
+    input_fluid: Optional[Json] = None,
+    output_item: Optional[Json] = None,
+    output_fluid: Optional[Json] = None,
+    on_seal: Optional[Json] = None,
+    on_unseal: Optional[Json] = None,
+    sound: Optional[str] = None,
+):
+    rm.recipe(
+        ("barrel", name_parts),
+        "tfc:barrel_sealed",
+        {
+            "input_item": item_stack_ingredient(input_item)
+            if input_item is not None
+            else None,
+            "input_fluid": fluid_stack_ingredient(input_fluid)
+            if input_fluid is not None
+            else None,
+            "output_item": item_stack_provider(output_item)
+            if isinstance(output_item, str)
+            else output_item,
+            "output_fluid": fluid_stack(output_fluid)
+            if output_fluid is not None
+            else None,
+            "duration": duration,
+            "on_seal": on_seal,
+            "on_unseal": on_unseal,
+            "sound": sound,
+        },
+    )
+    res = utils.resource_location("tfcchannelcasting", name_parts)
+    rm.lang(
+        "tfc.recipe.barrel." + res.domain + ".barrel." + res.path.replace("/", "."),
+        lang(translation),
+    )
+
+
+def item_stack_provider(
+    data_in: Json = None,
+    copy_input: bool = False,
+    add_trait: Optional[str] = None,
+    modifiers: list[str | dict] = [],
+) -> Json:
+    if isinstance(data_in, dict):
+        return data_in
+    stack = utils.item_stack(data_in) if data_in is not None else None
+    modifiers = modifiers.copy()
+
+    if copy_input:
+        modifiers.insert(0, "tfc:copy_input")
+    if add_trait:
+        modifiers.append(
+            {
+                "type": "tfc:add_trait",
+                "trait": add_trait,
+            },
+        )
+
+    if modifiers:
+        return {"stack": stack, "modifiers": modifiers}
+    return stack
 
 
 def water_based_fluid(rm: ResourceManager, name: str):
@@ -255,7 +372,7 @@ def fire_clay_knapping(
     )
 
 
-def fire_clay_knapping(
+def clay_knapping(
     rm: ResourceManager,
     name_parts,
     pattern: List[str],
@@ -263,7 +380,7 @@ def fire_clay_knapping(
     outside_slot_required: bool = None,
 ):
     knapping_recipe(
-        rm, "fire_clay_knapping", name_parts, pattern, result, outside_slot_required
+        rm, "clay_knapping", name_parts, pattern, result, outside_slot_required
     )
 
 
@@ -312,6 +429,7 @@ def heat_recipe(
     result_item: Optional[Union[str, Json]] = None,
     result_fluid: Optional[str] = None,
     use_durability: Optional[bool] = None,
+    conditions: Json = None,
 ) -> RecipeContext:
     result_item = (
         utils.item_stack(result_item) if isinstance(result_item, str) else result_item
@@ -327,6 +445,7 @@ def heat_recipe(
             "temperature": temperature,
             "use_durability": use_durability if use_durability else None,
         },
+        conditions=conditions,
     )
 
 
@@ -372,6 +491,27 @@ def item_size(
             "size": size.name,
             "weight": weight.name,
         },
+    )
+
+
+def ingredient_without_traits(ingredient: Json, *trait: str):
+    if len(trait) == 0:
+        return utils.item_stack(ingredient)
+
+    return {
+        "type": "tfc:lacks_trait",
+        "trait": trait[0],
+        "ingredient": ingredient_without_traits(ingredient, *trait[1:]),
+    }
+
+
+def ingredient_without_filling(ingredient: Json):
+    return ingredient_without_traits(
+        ingredient,
+        *[
+            f"tfcchannelcasting:filled_with_{fill}"
+            for fill in ("jam", "sweet_liquor", "strong_liquor", "whiskey")
+        ],
     )
 
 
@@ -510,6 +650,13 @@ def generate_recipes(mngr: ResourceManager):
         "tfcchannelcasting:unfired_mold_table",
     )
 
+    clay_knapping(
+        mngr,
+        "unfired_heart_mold",
+        ["X X X", "     ", "     ", "X   X", "XX XX"],
+        "tfcchannelcasting:unfired_heart_mold",
+    )
+
     heat_recipe(
         mngr,
         "channel",
@@ -567,7 +714,10 @@ def generate_chocolate_stuff(mngr: ResourceManager):
 
         mngr.lang(f"metal.tfcchannelcasting.{chocolate}", lang(chocolate))
 
-        mngr.item_tag(f"forge:ingots/{chocolate}", f"firmalife:food/{chocolate}")
+        mngr.item_tag(
+            f"forge:ingots/{chocolate}",
+            {"id": f"firmalife:food/{chocolate}", "required": False},
+        )
         mngr.item_tag("forge:ingots", f"#forge:ingots/{chocolate}")
         mngr.item_tag("tfc:pileable_ingots", f"#forge:ingots/{chocolate}")
 
@@ -577,43 +727,22 @@ def generate_chocolate_stuff(mngr: ResourceManager):
         mngr.item_tag("tfc:pileable_sheets", f"#forge:sheets/{chocolate}")
 
         water_based_fluid(mngr, chocolate)
-        mngr.fluid_tag(
+        for tag in (
             "tfcchannelcasting:usable_in_heart_mold",
-            f"tfcchannelcasting:{chocolate}",
-            "tfcchannelcasting:flowing_%s" % chocolate,
-        )
-        mngr.fluid_tag(
             "tfc:usable_in_ingot_mold",
-            f"tfcchannelcasting:{chocolate}",
-            f"tfcchannelcasting:flowing_{chocolate}",
-        )
-
-        mngr.item(("food", f"{chocolate}_heart")).with_lang(
-            lang(f"{chocolate} Heart")
-        ).with_tag("tfcchannelcasting:foods/chocolate_heart", False).with_item_model()
-        food_item(
-            mngr,
-            "chocolate_heart",
-            "#tfcchannelcasting:foods/chocolate_heart",
-            Category.other,
-            4,
-            1,
-            0,
-            0.3,
-            dairy=0.5,
-            grain=0.5,
-        )
+            "tfc:usable_in_tool_head_mold",
+            "tfc:usable_in_bell_mold",
+        ):
+            mngr.fluid_tag(
+                tag,
+                f"tfcchannelcasting:{chocolate}",
+                "tfcchannelcasting:flowing_%s" % chocolate,
+            )
 
         item_heat(
             mngr,
             ("food", chocolate),
             f"firmalife:food/{chocolate}",
-            metal.ingot_heat_capacity(),
-        )
-        item_heat(
-            mngr,
-            ("food", f"{chocolate}_heart"),
-            f"tfcchannelcasting:food/{chocolate}_heart",
             metal.ingot_heat_capacity(),
         )
 
@@ -624,14 +753,7 @@ def generate_chocolate_stuff(mngr: ResourceManager):
             300,
             None,
             f"100 tfcchannelcasting:{chocolate}",
-        )
-        heat_recipe(
-            mngr,
-            ("food", f"{chocolate}_heart"),
-            not_rotten(f"tfcchannelcasting:food/{chocolate}_heart"),
-            300,
-            None,
-            f"100 tfcchannelcasting:{chocolate}",
+            conditions=FIRMALIFE_CONDITIONS,
         )
 
         casting_recipe(
@@ -642,15 +764,189 @@ def generate_chocolate_stuff(mngr: ResourceManager):
             100,
             f"firmalife:food/{chocolate}",
             0,
+            conditions=FIRMALIFE_CONDITIONS,
         )
         casting_recipe(
             mngr,
-            f"{chocolate}_heart",
-            "tfcchannelcasting:heart_mold",
+            f"{chocolate}_fire_ingot",
+            "tfc:ceramic/fire_ingot_mold",
             chocolate,
             100,
-            f"tfcchannelcasting:food/{chocolate}_heart",
+            f"firmalife:food/{chocolate}",
             0,
+            conditions=FIRMALIFE_CONDITIONS,
+        )
+
+        for chocolate_type, trait, month, mold, name in zip(
+            ("heart", "bell", "knife"),
+            (
+                "tfcchannelcasting:romantic",
+                "tfcchannelcasting:festive",
+                "tfcchannelcasting:scary",
+            ),
+            (2, 12, 10),
+            (
+                "tfcchannelcasting:heart_mold",
+                "tfc:ceramic/bell_mold",
+                "tfc:ceramic/knife_blade_mold",
+            ),
+            ("Heart", "Christmas Bell", "Candy Knife"),
+        ):
+            item = f"{chocolate}_{chocolate_type}"
+            loc = f"tfcchannelcasting:food/{item}"
+
+            mngr.item_tag(
+                ("foods", "chocolate_sweet"),
+                f"#tfcchannelcasting:foods/chocolate_{chocolate_type}",
+                replace=False,
+            )
+
+            mngr.item(("food", item)).with_lang(lang(f"{chocolate} {name}")).with_tag(
+                f"tfcchannelcasting:foods/chocolate_{chocolate_type}", False
+            ).with_item_model()
+
+            item_heat(
+                mngr,
+                ("food", item),
+                loc,
+                metal.ingot_heat_capacity(),
+            )
+
+            heat_recipe(
+                mngr,
+                ("food", item),
+                not_rotten(loc),
+                300,
+                None,
+                f"100 tfcchannelcasting:{chocolate}",
+            )
+
+            casting_recipe(
+                mngr,
+                item,
+                mold,
+                chocolate,
+                100,
+                item_stack_provider(
+                    loc,
+                    modifiers=[
+                        {
+                            "type": "tfcchannelcasting:conditional",
+                            "condition": {
+                                "type": "tfcchannelcasting:date_range",
+                                "min_day": 1,
+                                "min_month": month,
+                                "max_day": 8,
+                                "max_month": month,
+                            },
+                            "modifiers": [
+                                {
+                                    "type": "tfcchannelcasting:set_food_data",
+                                    **SPECIAL_CHOCOLATE_FOOD_DATA,
+                                },
+                                {
+                                    "type": "tfc:add_trait",
+                                    "trait": trait,
+                                },
+                            ],
+                            "else_modifiers": [
+                                {
+                                    "type": "tfcchannelcasting:set_food_data",
+                                    **NORMAL_CHOCOLATE_FOOD_DATA,
+                                },
+                            ],
+                        },
+                    ],
+                ),
+                0,
+            )
+
+    mngr.fluid_tag(
+        "tfcchannelcasting:sweet_liquor",
+        "tfc:cider",
+        "tfc:rum",
+        replace=False,
+    )
+
+    mngr.fluid_tag(
+        "tfcchannelcasting:strong_liquor",
+        "tfc:sake",
+        "tfc:vodka",
+        replace=False,
+    )
+
+    mngr.fluid_tag(
+        "tfcchannelcasting:whiskey",
+        "tfc:whiskey",
+        "tfc:corn_whiskey",
+        "tfc:rye_whiskey",
+        replace=False,
+    )
+
+    for chocolate_type, trait in zip(
+        ("heart", "bell", "knife"),
+        (
+            "tfcchannelcasting:romantic",
+            "tfcchannelcasting:festive",
+            "tfcchannelcasting:scary",
+        ),
+    ):
+        input_tag = f"#tfcchannelcasting:foods/chocolate_{chocolate_type}"
+        local_input_wout_fill = ingredient_without_filling(input_tag)
+
+        advanced_shapeless(
+            mngr,
+            f"crafting/{chocolate_type}_add_jam",
+            (local_input_wout_fill, "#firmalife:foods/preserves"),
+            item_stack_provider(
+                copy_input=True,
+                add_trait="tfcchannelcasting:filled_with_jam",
+                modifiers=[
+                    {
+                        "type": "tfcchannelcasting:conditional",
+                        "condition": {
+                            "type": "tfcchannelcasting:has_trait",
+                            "trait": trait,
+                        },
+                        "modifiers": [
+                            {
+                                "type": "tfcchannelcasting:set_food_data",
+                                **SPECIAL_CHOCOLATE_FOOD_DATA,
+                                **JAM_CHOCOLATE_FOOD_DATA,
+                            },
+                        ],
+                        "else_modifiers": [
+                            {
+                                "type": "tfcchannelcasting:set_food_data",
+                                **NORMAL_CHOCOLATE_FOOD_DATA,
+                                **JAM_CHOCOLATE_FOOD_DATA,
+                            },
+                        ],
+                    },
+                ],
+            ),
+            local_input_wout_fill,
+            conditions=FIRMALIFE_CONDITIONS,
+        )
+
+    local_input_wout_fill = ingredient_without_filling(
+        "#tfcchannelcasting:foods/chocolate_sweet"
+    )
+
+    for liq, liq_lan in zip(
+        ("sweet_liquor", "strong_liquor", "whiskey"),
+        ("Sweet Liquor", "Strong Liquor", "Whiskey"),
+    ):
+        barrel_sealed_recipe(
+            mngr,
+            f"fill_with_{liq}",
+            f"Filling with {liq_lan}",
+            24000,
+            local_input_wout_fill,
+            f"250 #tfcchannelcasting:{liq}",
+            item_stack_provider(
+                copy_input=True, add_trait=f"tfcchannelcasting:filled_with_{liq}"
+            ),
         )
 
 

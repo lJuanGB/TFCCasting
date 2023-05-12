@@ -1,0 +1,53 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:casting",
+  "mold": {
+    "item": "tfc:ceramic/knife_blade_mold"
+  },
+  "fluid": {
+    "ingredient": "tfcchannelcasting:milk_chocolate",
+    "amount": 100
+  },
+  "result": {
+    "stack": {
+      "item": "tfcchannelcasting:food/milk_chocolate_knife"
+    },
+    "modifiers": [
+      {
+        "type": "tfcchannelcasting:conditional",
+        "condition": {
+          "type": "tfcchannelcasting:date_range",
+          "min_day": 1,
+          "min_month": 10,
+          "max_day": 8,
+          "max_month": 10
+        },
+        "modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 1,
+            "dairy": 1
+          },
+          {
+            "type": "tfc:add_trait",
+            "trait": "tfcchannelcasting:scary"
+          }
+        ],
+        "else_modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 0.5,
+            "dairy": 0.5
+          }
+        ]
+      }
+    ]
+  },
+  "break_chance": 0
+}

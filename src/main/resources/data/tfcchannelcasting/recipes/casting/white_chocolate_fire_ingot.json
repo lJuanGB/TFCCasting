@@ -1,0 +1,21 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:casting",
+  "mold": {
+    "item": "tfc:ceramic/fire_ingot_mold"
+  },
+  "fluid": {
+    "ingredient": "tfcchannelcasting:white_chocolate",
+    "amount": 100
+  },
+  "result": {
+    "item": "firmalife:food/white_chocolate"
+  },
+  "break_chance": 0,
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "firmalife"
+    }
+  ]
+}

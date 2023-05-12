@@ -11,5 +11,11 @@
   "result": {
     "item": "firmalife:food/dark_chocolate"
   },
-  "break_chance": 0
+  "break_chance": 0,
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "firmalife"
+    }
+  ]
 }

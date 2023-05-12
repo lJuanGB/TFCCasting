@@ -11,5 +11,11 @@
     "fluid": "tfcchannelcasting:dark_chocolate",
     "amount": 100
   },
-  "temperature": 300
+  "temperature": 300,
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "firmalife"
+    }
+  ]
 }
