@@ -1,0 +1,15 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "type": "tfc:heating",
+  "ingredient": {
+    "type": "tfc:not_rotten",
+    "ingredient": {
+      "item": "tfcchannelcasting:food/dark_chocolate_bell"
+    }
+  },
+  "result_fluid": {
+    "fluid": "tfcchannelcasting:dark_chocolate",
+    "amount": 100
+  },
+  "temperature": 300
+}

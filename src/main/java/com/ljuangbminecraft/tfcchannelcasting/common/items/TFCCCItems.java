@@ -5,11 +5,13 @@ import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
 import static net.dries007.tfc.common.TFCItemGroup.FOOD;
 import static net.dries007.tfc.common.TFCItemGroup.MISC;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ExtraFluid;
@@ -44,20 +46,17 @@ public class TFCCCItems {
                     () -> new BucketItem(TFCCCFluids.EXTRA_FLUIDS.get(fluid).source(),
                             new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(MISC))));
 
-    public static final RegistryObject<Item> WHITE_CHOCOLATE_HEART = register(
-            "food/white_chocolate_heart",
-            () -> new DecayingItem(new Item.Properties()
-                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
-
-    public static final RegistryObject<Item> MILK_CHOCOLATE_HEART = register(
-            "food/milk_chocolate_heart",
-            () -> new DecayingItem(new Item.Properties()
-                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
-
-    public static final RegistryObject<Item> DARK_CHOCOLATE_HEART = register(
-            "food/dark_chocolate_heart",
-            () -> new DecayingItem(new Item.Properties()
-                    .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast().build()).tab(FOOD)));
+    public static final Map<ChocolateType, Map<ChocolateSweetType, RegistryObject<ChocolateSweetItem>>> CHOCOLATE_SWEET = Helpers
+            .mapOfKeys(
+                    ChocolateType.class,
+                    chocolate_type -> Helpers.mapOfKeys(
+                            ChocolateSweetType.class,
+                            sweet_type -> register(
+                                    "food/" + chocolate_type.id + "_chocolate_" + sweet_type.id,
+                                    () -> new ChocolateSweetItem(new Item.Properties()
+                                            .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast()
+                                                    .build())
+                                            .tab(FOOD)))));
 
     private static final HashMap<ResourceLocation, RegistryObject<Item>> moldStackToRenderItem = new HashMap<>();
 
@@ -77,6 +76,7 @@ public class TFCCCItems {
         registerRenderItem("tfc:ceramic/knife_blade_mold", register("mold/knife_blade"));
         registerRenderItem("tfc:ceramic/scythe_blade_mold", register("mold/scythe_blade"));
         registerRenderItem("tfc:ceramic/fire_ingot_mold", register("mold/fire_ingot"));
+        registerRenderItem("tfc:ceramic/bell_mold", register("mold/bell"));
         registerRenderItem("tfcchannelcasting:heart_mold", register("mold/heart"));
     }
 

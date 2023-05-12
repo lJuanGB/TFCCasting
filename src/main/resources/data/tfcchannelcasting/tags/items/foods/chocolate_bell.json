@@ -1,0 +1,9 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "replace": false,
+  "values": [
+    "tfcchannelcasting:food/dark_chocolate_bell",
+    "tfcchannelcasting:food/milk_chocolate_bell",
+    "tfcchannelcasting:food/white_chocolate_bell"
+  ]
+}

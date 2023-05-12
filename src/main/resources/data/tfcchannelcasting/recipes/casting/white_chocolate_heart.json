@@ -9,7 +9,45 @@
     "amount": 100
   },
   "result": {
-    "item": "tfcchannelcasting:food/white_chocolate_heart"
+    "stack": {
+      "item": "tfcchannelcasting:food/white_chocolate_heart"
+    },
+    "modifiers": [
+      {
+        "type": "tfcchannelcasting:conditional",
+        "condition": {
+          "type": "tfcchannelcasting:date_range",
+          "min_day": 1,
+          "min_month": 2,
+          "max_day": 8,
+          "max_month": 2
+        },
+        "modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 1,
+            "dairy": 1
+          },
+          {
+            "type": "tfc:add_trait",
+            "trait": "tfcchannelcasting:romantic"
+          }
+        ],
+        "else_modifiers": [
+          {
+            "type": "tfcchannelcasting:set_food_data",
+            "hunger": 4,
+            "saturation": 1,
+            "decay_modifier": 0.3,
+            "grain": 0.5,
+            "dairy": 0.5
+          }
+        ]
+      }
+    ]
   },
   "break_chance": 0
 }
