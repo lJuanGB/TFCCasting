@@ -1,12 +1,9 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
-import java.util.Optional;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCItems;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.dries007.tfc.client.RenderHelpers;
 import net.dries007.tfc.common.capabilities.MoldLike;
 import net.dries007.tfc.common.recipes.HeatingRecipe;
@@ -18,9 +15,14 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
+
+import java.util.Optional;
 
 public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEntity>
 {
@@ -32,7 +34,8 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
         // Render flow into the mold
         if (mold.hasSource())
         {
-            ResourceLocation texture = mold.getSourceFluid().getAttributes().getStillTexture();
+            ResourceLocation texture = IClientFluidTypeExtensions.of(mold.getSourceFluid().getFluidType()).getStillTexture();
+            //ResourceLocation texture = mold.getSourceFluid().getAttributes().getStillTexture();
             int color = RenderHelpers.getFluidColor(mold.getSourceFluid());
             TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(texture);
 
@@ -84,7 +87,7 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
                             RenderHelpers.renderTexturedQuads(
                                 poseStack, builder, sprite, combinedLight, combinedOverlay, 
                                 RenderHelpers.getYVertices(2f / 16, 1f / 16, 2f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, 14f / 16), 
-                                16f * (14f / 16 - 2f / 16), 16f * (14f / 16 - 2f / 16), 0, 0, 1);
+                                16f * (14f / 16 - 2f / 16), 16f * (14f / 16 - 2f / 16), 0, 0, 1,true);
                         }
                         else // fluid
                         {
@@ -99,10 +102,10 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
             // Render the mold
             poseStack.pushPose();
             poseStack.translate(0.5, 0.5, 0.5);
-            TFCCCItems.getRenderItem(moldStack.getItem().getRegistryName()).ifPresent(
+            TFCCCItems.getRenderItem(BuiltInRegistries.ITEM.getKey(moldStack.getItem())).ifPresent(
                 (item) -> {
                     ItemStack moldRenderStack = item.get().getDefaultInstance();
-                    Minecraft.getInstance().getItemRenderer().renderStatic(moldRenderStack, ItemTransforms.TransformType.FIXED, combinedLight, combinedOverlay, poseStack, buffer, 0);
+                    Minecraft.getInstance().getItemRenderer().renderStatic(moldRenderStack, ItemDisplayContext.FIXED, combinedLight, combinedOverlay, poseStack, buffer,Minecraft.getInstance().level, 0);
                 }
             );
             poseStack.popPose();

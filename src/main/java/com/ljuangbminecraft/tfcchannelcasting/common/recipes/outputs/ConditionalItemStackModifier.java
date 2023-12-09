@@ -2,7 +2,6 @@ package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import net.dries007.tfc.common.recipes.outputs.ItemStackModifier;
 import net.dries007.tfc.common.recipes.outputs.ItemStackModifiers;
 import net.dries007.tfc.util.JsonHelpers;

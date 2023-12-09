@@ -1,11 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blocks;
 
-import java.util.Map;
-import java.util.Optional;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
-
 import net.dries007.tfc.common.blocks.DirectionPropertyBlock;
 import net.dries007.tfc.common.blocks.EntityBlockExtension;
 import net.dries007.tfc.common.blocks.ExtendedBlock;
@@ -32,6 +28,9 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
 {

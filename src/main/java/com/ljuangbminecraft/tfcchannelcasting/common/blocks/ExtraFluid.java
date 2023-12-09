@@ -1,8 +1,8 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blocks;
 
-import java.util.Locale;
-
 import net.minecraft.util.StringRepresentable;
+
+import java.util.Locale;
 
 public enum ExtraFluid implements StringRepresentable
 {

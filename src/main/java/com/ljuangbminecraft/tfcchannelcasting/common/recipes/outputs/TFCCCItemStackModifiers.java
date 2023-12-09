@@ -1,6 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
 import net.minecraft.resources.ResourceLocation;
+
 import static net.dries007.tfc.common.recipes.outputs.ItemStackModifiers.register;
 
 public class TFCCCItemStackModifiers {
