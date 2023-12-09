@@ -1,7 +1,6 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
 import com.google.gson.JsonObject;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 

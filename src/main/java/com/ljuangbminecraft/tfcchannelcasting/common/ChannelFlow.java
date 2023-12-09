@@ -1,16 +1,4 @@
 package com.ljuangbminecraft.tfcchannelcasting.common;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -18,11 +6,13 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEnti
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
-
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.common.capabilities.Capabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,9 +20,15 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import org.apache.commons.lang3.tuple.Pair;
+
+
+import java.util.*;
 
 public class ChannelFlow 
 {
+    private ResourceLocation name;
+
     public static void fromCrucible(LevelAccessor level, CrucibleBlockEntity source, BlockPos originChannel)
     {
         // This checks that metal is present and molten
@@ -170,7 +166,7 @@ public class ChannelFlow
                 BlockPos relative = channelSource.offset( currentChannel.multiply(-1) );
                 int distance = Math.abs(relative.getX() + relative.getY() + relative.getZ());
                 BlockPos normal = new BlockPos(relative.getX()/distance, relative.getY()/distance, relative.getZ()/distance);
-                flowSource.put(currentChannel, Pair.of(Direction.fromNormal(normal), (byte) distance));
+                flowSource.put(currentChannel, Pair.of(Direction.fromDelta(normal.getX(),normal.getY(),normal.getZ()), (byte) distance));
                 nFlows.put(channelSource, nFlows.getOrDefault(channelSource, 0) + 1);
             }
         }
@@ -182,7 +178,7 @@ public class ChannelFlow
                     flowSource.get(channelOrMold),
                     true, 
                     nFlows.get(channelOrMold),
-                    fluid.getRegistryName()
+                    BuiltInRegistries.FLUID.getKey(fluid)
                 )
             );
             level.getBlockEntity(channelOrMold, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
@@ -193,12 +189,15 @@ public class ChannelFlow
         }
 
         level.getBlockEntity(originChannel, TFCCCBlockEntities.CHANNEL.get()).get().setLinkProperties(
-            Pair.of(Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), (byte) 1), 
+            Pair.of(Direction.fromDelta(source.getBlockPos().offset( originChannel.multiply(-1)).getX(),
+                    source.getBlockPos().offset( originChannel.multiply(-1)).getY(),
+                    source.getBlockPos().offset( originChannel.multiply(-1)).getZ()), (byte) 1),
             false, 
-            nFlows.get(originChannel), 
-            fluid.getRegistryName()
+            nFlows.get(originChannel),
+            BuiltInRegistries.FLUID.getKey(fluid)
         );
     }
+
 
     private static List<BlockPos> findAdjacent(LevelAccessor level, BlockPos current, boolean findMolds)
     {

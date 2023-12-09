@@ -1,7 +1,6 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
 import com.google.gson.JsonObject;
-
 import net.dries007.tfc.util.JsonHelpers;
 import net.dries007.tfc.util.calendar.Calendars;
 import net.dries007.tfc.util.calendar.Month;

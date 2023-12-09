@@ -1,11 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blocks;
 
-import java.util.Map;
-import java.util.Optional;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.ChannelFlow;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
-
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.common.blockentities.TFCBlockEntities;
 import net.dries007.tfc.common.blocks.DirectionPropertyBlock;
@@ -31,11 +27,13 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class ChannelBlock extends ExtendedBlock implements EntityBlockExtension
 {

@@ -1,7 +1,6 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
-
 import net.dries007.tfc.client.RenderHelpers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -16,7 +15,7 @@ public final class ClientEventHandler
         final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
         bus.addListener(ClientEventHandler::registerEntityRenderers);
-        bus.addListener(ClientEventHandler::onTextureStitch);
+        //bus.addListener(ClientEventHandler::onTextureStitch);
     }
 
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event)
@@ -24,8 +23,8 @@ public final class ClientEventHandler
         event.registerBlockEntityRenderer(TFCCCBlockEntities.CHANNEL.get(), ctx -> new ChannelBlockEntityRenderer());
         event.registerBlockEntityRenderer(TFCCCBlockEntities.MOLD_TABLE.get(), ctx -> new MoldBlockEntityRenderer());
     }
-
-    public static void onTextureStitch(TextureStitchEvent.Pre event)
+    /*
+    public static void onTextureStitch(TextureStitchEvent event)
     {
         final ResourceLocation sheet = event.getAtlas().location();
         if (sheet.equals(RenderHelpers.BLOCKS_ATLAS))
@@ -35,4 +34,5 @@ public final class ClientEventHandler
             event.addSprite(new ResourceLocation("tfcchannelcasting", "block/metal/full/white_chocolate") );
         }
     }
+    */
 }

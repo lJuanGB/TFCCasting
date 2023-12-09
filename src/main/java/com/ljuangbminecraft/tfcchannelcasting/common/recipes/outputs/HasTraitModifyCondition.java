@@ -1,7 +1,6 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
 import com.google.gson.JsonObject;
-
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.FoodTrait;
 import net.dries007.tfc.util.JsonHelpers;

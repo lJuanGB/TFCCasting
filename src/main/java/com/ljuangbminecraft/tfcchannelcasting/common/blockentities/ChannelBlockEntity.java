@@ -1,11 +1,6 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blockentities;
 
-import java.util.Optional;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
-
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.common.blockentities.TFCBlockEntities;
 import net.dries007.tfc.common.blockentities.TFCBlockEntity;
@@ -15,6 +10,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Optional;
 
 public class ChannelBlockEntity extends TFCBlockEntity
 {

@@ -1,23 +1,11 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.blockentities;
 
-import java.util.Optional;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
-
 import net.dries007.tfc.common.blockentities.CrucibleBlockEntity;
 import net.dries007.tfc.common.blockentities.InventoryBlockEntity;
 import net.dries007.tfc.common.blockentities.TFCBlockEntities;
 import net.dries007.tfc.common.blockentities.TickableInventoryBlockEntity;
-import net.dries007.tfc.common.capabilities.Capabilities;
-import net.dries007.tfc.common.capabilities.MoldLike;
-import net.dries007.tfc.common.capabilities.PartialFluidHandler;
-import net.dries007.tfc.common.capabilities.PartialItemHandler;
-import net.dries007.tfc.common.capabilities.SidedHandler;
+import net.dries007.tfc.common.capabilities.*;
 import net.dries007.tfc.common.capabilities.heat.HeatCapability;
 import net.dries007.tfc.common.capabilities.heat.IHeat;
 import net.dries007.tfc.common.capabilities.heat.IHeatBlock;
@@ -29,6 +17,7 @@ import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.Metal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -47,6 +36,13 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.tuple.Pair;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Optional;
+
+import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
 
 public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntity.MoldBlockInventory> {
     public static void serverTick(Level level, BlockPos pos, BlockState state, MoldBlockEntity mold)
@@ -104,7 +100,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
             final CastingRecipe recipe = CastingRecipe.get(moldItem);
             if (recipe != null)
             {
-                Optional.ofNullable( recipe.assemble(moldItem) ).ifPresent(
+                Optional.ofNullable( recipe.assemble(moldItem, level.registryAccess())).ifPresent(
                     stack -> {
                         mold.inventory.setStackInSlot(OUTPUT_SLOT, stack);
                         moldItem.drainIgnoringTemperature(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
@@ -129,7 +125,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
 
         if (metal == null
                 || (shouldBeFluid.isPresent()
-                        && (metal.getFluid().getRegistryName() != shouldBeFluid.get().getRegistryName()))
+                        && (BuiltInRegistries.FLUID.getKey(metal.getFluid()) != BuiltInRegistries.FLUID.getKey(shouldBeFluid.get())))
                 || (metal.getMeltTemperature() > crucibleHeatHandler.getTemperature())) {
             return Optional.empty();
         }
@@ -165,7 +161,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
 
     public static final int MOLD_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
-    private static final Component NAME = Helpers.literal("Mold table");
+    private static final Component NAME = Component.translatable(MOD_ID + ".block_entity.mold table");
 
     public MoldBlockEntity(BlockPos pos, BlockState state) {
         super(TFCCCBlockEntities.MOLD_TABLE.get(), pos, state, MoldBlockInventory::new, NAME);
@@ -341,7 +337,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
             nbt.putLong("sourcePosition", sourcePosition.get().asLong());
             nbt.putByte("flowSource", (byte) flowSource.get().getLeft().ordinal());
             nbt.putByte("flowSourceDistance", flowSource.get().getRight());
-            nbt.putString("fluid", fluid.get().getRegistryName().toString());
+            nbt.putString("fluid", BuiltInRegistries.FLUID.getKey(fluid.get()).toString());
         }
         super.saveAdditional(nbt);
     }
