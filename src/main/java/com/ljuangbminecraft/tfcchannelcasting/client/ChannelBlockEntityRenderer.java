@@ -4,7 +4,6 @@ package com.ljuangbminecraft.tfcchannelcasting.client;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.ChannelBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-
 import net.dries007.tfc.client.RenderHelpers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -13,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ChannelBlockEntityRenderer implements BlockEntityRenderer<ChannelBlockEntity>
@@ -26,7 +26,7 @@ public class ChannelBlockEntityRenderer implements BlockEntityRenderer<ChannelBl
         }
         
         Fluid fluid = ForgeRegistries.FLUIDS.getValue(channel.getFluid());
-        ResourceLocation texture = fluid.getAttributes().getStillTexture();
+        ResourceLocation texture = IClientFluidTypeExtensions.of(fluid.getFluidType()).getStillTexture();
         int color = RenderHelpers.getFluidColor(fluid);
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(texture);
 

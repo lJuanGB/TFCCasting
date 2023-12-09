@@ -1,16 +1,15 @@
 package com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs;
 
-import java.util.Objects;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-
 import net.dries007.tfc.util.JsonHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Objects;
 
 public class ModifyConditions {
     private static final BiMap<ResourceLocation, ModifyCondition.Serializer<?>> REGISTRY = HashBiMap.create();

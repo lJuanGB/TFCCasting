@@ -1,7 +1,5 @@
 package com.ljuangbminecraft.tfcchannelcasting;
 
-import org.slf4j.Logger;
-
 import com.ljuangbminecraft.tfcchannelcasting.client.ClientEventHandler;
 import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
@@ -9,13 +7,13 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ChannelBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.MoldBlock;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCBlocks;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
+//import com.ljuangbminecraft.tfcchannelcasting.common.items.ChocolateSweetItem;
+import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCFoodTraits;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCItems;
+import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCTabs;
 import com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs.ModifyConditions;
 import com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs.TFCCCItemStackModifiers;
-import com.ljuangbminecraft.tfcchannelcasting.common.items.ChocolateSweetItem;
-import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCFoodTraits;
 import com.mojang.logging.LogUtils;
-
 import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.util.InteractionManager;
@@ -27,11 +25,13 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.slf4j.Logger;
 import vazkii.patchouli.api.IMultiblock;
 import vazkii.patchouli.api.PatchouliAPI;
 
@@ -48,6 +48,9 @@ public class TFCChannelCasting {
                 TFCCCBlockEntities.BLOCK_ENTITIES.register(bus);
                 TFCCCItems.ITEMS.register(bus);
                 TFCCCFluids.FLUIDS.register(bus);
+                TFCCCTabs.register(bus);
+
+                bus.addListener(this::addCreative);
 
                 bus.addListener(this::setup);
 
@@ -64,11 +67,14 @@ public class TFCChannelCasting {
                 event.enqueueWork(() -> {
                         TFCChannelCasting.registerInteractions();
                         TFCCCFoodTraits.init();
-                        ChocolateSweetItem.registerTraitEffects();
+                        //ChocolateSweetItem.registerTraitEffects();
                 });
                 registerPatchouliMultiBlock();
         }
+        private void addCreative(BuildCreativeModeTabContentsEvent event) {
 
+
+        }
         // Handle shift-right click on molds
         public static void registerInteractions() {
                 InteractionManager.register(
