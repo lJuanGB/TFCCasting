@@ -1,19 +1,19 @@
 plugins {
     id("java")
     id("com.matthewprenger.cursegradle") version "1.4.0"
-    id("net.minecraftforge.gradle") version "5.1.+"
+    id("net.minecraftforge.gradle") version "[6.0,6.2)"
     id("org.parchmentmc.librarian.forgegradle") version "1.+"
     id("org.spongepowered.mixin") version "0.7.+"
 }
 
-version = "0.1.6-beta"
+version = "0.2.0-beta"
 group = "com.ljuangbminecraft.tfcchannelcasting"
 archivesBaseName = "tfcchannelcasting"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: '2022.03.13-1.18.2'
+    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
     //mappings channel: 'official', version: '1.18.2'
     
     // accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg") // Currently, this location cannot be changed from the default.
@@ -27,7 +27,7 @@ minecraft {
             property("forge.logging.markers", "REGISTRIES")
             property("forge.logging.console.level", "debug")
 
-            jvmArgs("-ea", "-Xmx4G", "-Xms4G")
+            jvmArgs("-Xmx4G", "-Xms4G") // add "-ea" for tests, but they are hard-fail now
 
             mods {
                 tfcchannelcasting {
@@ -78,8 +78,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    //implementation(fg.deobf("tfc:TerraFirmaCraft-Forge-${minecraft_version}:${tfc_version}"))
-    implementation fg.deobf("curse.maven:tfc-302973:${tfc_identifier}")
+    implementation(fg.deobf("tfc:TerraFirmaCraft-Forge-${minecraft_version}:${tfc_version}"))
+    //implementation fg.deobf("curse.maven:tfc-302973:${tfc_identifier}")
 
     // if (System.getProperty("idea.sync.active") != "true") {
         annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
@@ -95,8 +95,9 @@ dependencies {
     //runtimeOnly(fg.deobf("curse.maven:top-245211:${top_version}"))
 
     // JEI
-    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api"))
-    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
     // Firmalife
     compileOnly(fg.deobf("curse.maven:firmalife-453394:${firmalife_version}"))
