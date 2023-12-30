@@ -4,8 +4,8 @@ import json
 import sys
 from typing import *
 
-from mcresources import RecipeContext, ResourceManager, utils
-from mcresources.type_definitions import Json
+from mcresources import RecipeContext, ResourceManager, utils, atlases
+from mcresources.type_definitions import ResourceIdentifier, Json
 
 POTTERY_MELT = 1400 - 1
 POTTERY_HEAT_CAPACITY = 1.2  # Heat Capacity # Useful comment
@@ -353,35 +353,29 @@ def water_based_fluid(rm: ResourceManager, name: str):
 
     item = rm.custom_item_model(
         ("bucket", name),
-        "forge:bucket",
+        "forge:fluid_container",
         {"parent": "forge:item/bucket", "fluid": "tfcchannelcasting:%s" % name},
     )
     item.with_lang(lang("%s bucket", name))
     rm.lang("fluid.tfcchannelcasting.%s" % name, lang(name))
 
 
-def fire_clay_knapping(
-    rm: ResourceManager,
-    name_parts,
-    pattern: List[str],
-    result,
-    outside_slot_required: bool = None,
-):
-    knapping_recipe(
-        rm, "fire_clay_knapping", name_parts, pattern, result, outside_slot_required
-    )
+def clay_knapping(rm: ResourceManager, name_parts: ResourceIdentifier, pattern: List[str], result: Json, outside_slot_required: bool = None):
+    stack = utils.item_stack(result)
+    if ('count' in stack and stack['count'] == 1) or 'count' not in stack:
+        rm.item_tag('clay_recycle_5', stack['item'])
+    else:
+        rm.item_tag('clay_recycle_1', stack['item'])
+    knapping_recipe(rm, name_parts, 'tfc:clay', pattern, result, None, outside_slot_required)
 
 
-def clay_knapping(
-    rm: ResourceManager,
-    name_parts,
-    pattern: List[str],
-    result,
-    outside_slot_required: bool = None,
-):
-    knapping_recipe(
-        rm, "clay_knapping", name_parts, pattern, result, outside_slot_required
-    )
+def fire_clay_knapping(rm: ResourceManager, name_parts: ResourceIdentifier, pattern: List[str], result: Json, outside_slot_required: bool = None):
+    stack = utils.item_stack(result)
+    if ('count' in stack and stack['count'] == 1) or 'count' not in stack:
+        rm.item_tag('fire_clay_recycle_5', stack['item'])
+    else:
+        rm.item_tag('fire_clay_recycle_1', stack['item'])
+    knapping_recipe(rm, name_parts, 'tfc:fire_clay', pattern, result, None, outside_slot_required)
 
 
 def contained_fluid(
@@ -402,23 +396,16 @@ def fluid_stack(data_in: Json) -> Json:
     return {"fluid": fluid, "amount": amount}
 
 
-def knapping_recipe(
-    rm: ResourceManager,
-    knapping_type: str,
-    name_parts,
-    pattern: List[str],
-    result,
-    outside_slot_required: bool = None,
-):
-    rm.recipe(
-        (knapping_type, name_parts),
-        "tfc:%s" % knapping_type,
-        {
-            "outside_slot_required": outside_slot_required,
-            "pattern": pattern,
-            "result": utils.item_stack(result),
-        },
-    )
+def knapping_recipe(rm: ResourceManager, name_parts: ResourceIdentifier, knap_type: str, pattern: List[str], result: Json, ingredient: Json, outside_slot_required: bool):
+    for part in pattern:
+        assert 0 < len(part) < 6, 'Incorrect length: %s' % part
+    rm.recipe((knap_type.split(':')[1] + '_knapping', name_parts), 'tfc:knapping', {
+        'knapping_type': knap_type,
+        'outside_slot_required': outside_slot_required,
+        'pattern': pattern,
+        'ingredient': None if ingredient is None else utils.ingredient(ingredient),
+        'result': utils.item_stack(result)
+    })
 
 
 def heat_recipe(
@@ -725,6 +712,7 @@ def generate_chocolate_stuff(mngr: ResourceManager):
             f"forge:sheets/{chocolate}",
         )
         mngr.item_tag("tfc:pileable_sheets", f"#forge:sheets/{chocolate}")
+        mngr.block_tag("minecraft:replaceable", f"tfcchannelcasting:fluid/{chocolate}")
 
         water_based_fluid(mngr, chocolate)
         for tag in (
@@ -897,7 +885,7 @@ def generate_chocolate_stuff(mngr: ResourceManager):
         advanced_shapeless(
             mngr,
             f"crafting/{chocolate_type}_add_jam",
-            (local_input_wout_fill, "#firmalife:foods/preserves"),
+            (local_input_wout_fill, "#tfc:foods/preserves"),
             item_stack_provider(
                 copy_input=True,
                 add_trait="tfcchannelcasting:filled_with_jam",
@@ -950,8 +938,8 @@ def generate_chocolate_stuff(mngr: ResourceManager):
         )
 
 
-def generate_mold_models(mngr):
-    pass
+def generate_atlas(mngr):
+    mngr.atlas('chocolates', atlases.directory('block/metal/smooth'))
 
 
 def main():
@@ -963,6 +951,7 @@ def main():
     generate_items(mngr)
     generate_recipes(mngr)
     generate_chocolate_stuff(mngr)
+    generate_atlas(mngr)
     load_lang(mngr)
     mngr.flush()
 
