@@ -1,17 +1,16 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
+import com.mojang.math.Axis;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
 
 import net.dries007.tfc.client.RenderHelpers;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /*
@@ -71,9 +70,9 @@ public class FluidRenderHelpers
             case UP:  
                 renderBox = Block.box(6.0f,  4.0f, 6.0f,  10.0f, 16.0f, 10.0f);
                 break;
-            case SOUTH: poseStack.mulPose(Vector3f.YP.rotationDegrees(90f)); // Combined rotation: 270
-            case WEST:  poseStack.mulPose(Vector3f.YP.rotationDegrees(90f)); // Combined rotation: 180
-            case NORTH: poseStack.mulPose(Vector3f.YP.rotationDegrees(90f)); // Combined rotation: 90
+            case SOUTH: poseStack.mulPose(Axis.YP.rotationDegrees(90f)); // Combined rotation: 270
+            case WEST:  poseStack.mulPose(Axis.YP.rotationDegrees(90f)); // Combined rotation: 180
+            case NORTH: poseStack.mulPose(Axis.YP.rotationDegrees(90f)); // Combined rotation: 90
             case EAST:  
                 renderBox = Block.box(
                     10.0f, 1.0f, 6.0f, 
