@@ -104,7 +104,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
             final CastingRecipe recipe = CastingRecipe.get(moldItem);
             if (recipe != null)
             {
-                Optional.ofNullable( recipe.assemble(moldItem) ).ifPresent(
+                Optional.ofNullable( recipe.assemble(moldItem, level.registryAccess()) ).ifPresent(
                     stack -> {
                         mold.inventory.setStackInSlot(OUTPUT_SLOT, stack);
                         moldItem.drainIgnoringTemperature(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
@@ -129,7 +129,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
 
         if (metal == null
                 || (shouldBeFluid.isPresent()
-                        && (metal.getFluid().getRegistryName() != shouldBeFluid.get().getRegistryName()))
+                        && (ForgeRegistries.FLUIDS.getKey(metal.getFluid()) != ForgeRegistries.FLUIDS.getKey(shouldBeFluid.get())))
                 || (metal.getMeltTemperature() > crucibleHeatHandler.getTemperature())) {
             return Optional.empty();
         }
@@ -165,7 +165,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
 
     public static final int MOLD_SLOT = 0;
     public static final int OUTPUT_SLOT = 1;
-    private static final Component NAME = Helpers.literal("Mold table");
+    private static final Component NAME = Component.literal("Mold table");
 
     public MoldBlockEntity(BlockPos pos, BlockState state) {
         super(TFCCCBlockEntities.MOLD_TABLE.get(), pos, state, MoldBlockInventory::new, NAME);
@@ -341,7 +341,7 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
             nbt.putLong("sourcePosition", sourcePosition.get().asLong());
             nbt.putByte("flowSource", (byte) flowSource.get().getLeft().ordinal());
             nbt.putByte("flowSourceDistance", flowSource.get().getRight());
-            nbt.putString("fluid", fluid.get().getRegistryName().toString());
+            nbt.putString("fluid", ForgeRegistries.FLUIDS.getKey(fluid.get()).toString());
         }
         super.saveAdditional(nbt);
     }
