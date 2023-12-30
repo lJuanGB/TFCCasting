@@ -16,7 +16,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class TFCCCBlockEntities 
 {
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MOD_ID);
 
     public static final RegistryObject<BlockEntityType<MoldBlockEntity>> MOLD_TABLE = register("mold_table", MoldBlockEntity::new, TFCCCBlocks.MOLD_TABLE);
     public static final RegistryObject<BlockEntityType<ChannelBlockEntity>> CHANNEL = register("channel", ChannelBlockEntity::new, TFCCCBlocks.CHANNEL);
