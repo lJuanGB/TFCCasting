@@ -2,28 +2,22 @@ package com.ljuangbminecraft.tfcchannelcasting.common.items;
 
 import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.LOGGER;
 import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
-import static net.dries007.tfc.common.TFCItemGroup.FOOD;
-import static net.dries007.tfc.common.TFCItemGroup.MISC;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ExtraFluid;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
 
-import net.dries007.tfc.common.items.DecayingItem;
 import net.dries007.tfc.common.items.MoldItem;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.DeferredRegister;
@@ -33,18 +27,18 @@ import net.minecraftforge.registries.RegistryObject;
 public class TFCCCItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
-    public static final RegistryObject<Item> UNFIRED_CHANNEL = register("unfired_channel", MISC);
-    public static final RegistryObject<Item> UNFIRED_MOLD_TABLE = register("unfired_mold_table", MISC);
+    public static final RegistryObject<Item> UNFIRED_CHANNEL = register("unfired_channel");
+    public static final RegistryObject<Item> UNFIRED_MOLD_TABLE = register("unfired_mold_table");
 
-    public static final RegistryObject<Item> UNFIRED_HEART_MOLD = register("unfired_heart_mold", MISC);
+    public static final RegistryObject<Item> UNFIRED_HEART_MOLD = register("unfired_heart_mold");
     public static final RegistryObject<Item> HEART_MOLD = register("heart_mold",
-            () -> new MoldItem(() -> 100, TFCCCTags.Fluids.USABLE_IN_HEART_MOLD, new Item.Properties().tab(MISC)));
+            () -> new MoldItem(() -> 100, TFCCCTags.Fluids.USABLE_IN_HEART_MOLD, new Item.Properties()));
 
     public static final Map<ExtraFluid, RegistryObject<BucketItem>> EXTRA_FLUID_BUCKETS = Helpers.mapOfKeys(
             ExtraFluid.class,
             fluid -> register("bucket/" + fluid.getSerializedName(),
                     () -> new BucketItem(TFCCCFluids.EXTRA_FLUIDS.get(fluid).source(),
-                            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(MISC))));
+                            new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1))));
 
     public static final Map<ChocolateType, Map<ChocolateSweetType, RegistryObject<ChocolateSweetItem>>> CHOCOLATE_SWEET = Helpers
             .mapOfKeys(
@@ -55,8 +49,7 @@ public class TFCCCItems {
                                     "food/" + chocolate_type.id + "_chocolate_" + sweet_type.id,
                                     () -> new ChocolateSweetItem(new Item.Properties()
                                             .food(new FoodProperties.Builder().nutrition(4).saturationMod(0.3f).fast()
-                                                    .build())
-                                            .tab(FOOD)))));
+                                                    .build())))));
 
     private static final HashMap<ResourceLocation, RegistryObject<Item>> moldStackToRenderItem = new HashMap<>();
 
@@ -110,9 +103,5 @@ public class TFCCCItems {
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item) {
         return ITEMS.register(name.toLowerCase(Locale.ROOT), item);
-    }
-
-    private static RegistryObject<Item> register(String name, CreativeModeTab group) {
-        return register(name, () -> new Item(new Item.Properties().tab(group)));
     }
 }
