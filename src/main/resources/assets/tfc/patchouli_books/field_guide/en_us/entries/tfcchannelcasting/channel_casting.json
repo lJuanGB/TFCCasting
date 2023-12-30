@@ -1,6 +1,6 @@
 {
     "name": "Casting with Channels",
-    "category": "tfc:mechanics",
+    "category": "tfc:tfcchannelcasting",
     "icon": "tfcchannelcasting:channel",
     "pages": [
       {
@@ -8,12 +8,12 @@
         "text": "You can cast from a $(thing)Crucible$() to more than one mold at a time using $(thing)Channels$() and $(thing)Mold Tables$(). Simply connect the $(thing)Mold Tables$() to the $(thing)Crucible$() using $(thing)Channels$() and right-click on the $(thing)Channel$() next to the $(thing)Crucible$(). Shift-right-click the $(thing)Mold Table$() with a $(l:getting_started/pottery#mold)Mold$() to place it or remove it."
       },
       {
-        "type": "tfc:fire_clay_knapping_recipe",
+        "type": "tfc:knapping_recipe",
         "recipe": "tfcchannelcasting:fire_clay_knapping/unfired_channel_4",
         "text": "Knapping several $(thing)Unfired Channels$()."
       },
       {
-        "type": "tfc:fire_clay_knapping_recipe",
+        "type": "tfc:knapping_recipe",
         "recipe": "tfcchannelcasting:fire_clay_knapping/unfired_mold_table",
         "text": "Knapping an $(thing)Unfired Mold Table$()."
       },

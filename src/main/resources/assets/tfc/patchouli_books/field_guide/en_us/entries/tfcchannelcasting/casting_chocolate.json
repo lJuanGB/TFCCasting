@@ -1,6 +1,6 @@
 {
   "name": "Casting Chocolate",
-  "category": "tfc:mechanics",
+  "category": "tfc:tfcchannelcasting",
   "icon": "tfcchannelcasting:food/milk_chocolate_heart",
   "pages": [
     {
@@ -8,7 +8,7 @@
       "text": "The following content is only available if Firmalife is installed. $(thing)Chocolate$() does not need to come only in boring bars! Melt down $(thing)White$(), $(thing)Milk$(), or $(thing)Dark$() chocolate in a $(thing)Vessel$() or $(thing)Crucible$() and then cast it into a mold to obtain chocolate confections. There are three types of chocolate confections: $(thing)Hearts$(), $(thing)Bells$(), and $(thing)Knives$(). Each is obtained by casting chocolate into a different mold."
     },
     {
-      "type": "tfc:clay_knapping_recipe",
+      "type": "tfc:knapping_recipe",
       "recipe": "tfcchannelcasting:clay_knapping/unfired_heart_mold",
       "text": "Knapping a $(thing)Heart Mold$(), used to create $(thing)Heart$()-shaped chocolates."
     },
