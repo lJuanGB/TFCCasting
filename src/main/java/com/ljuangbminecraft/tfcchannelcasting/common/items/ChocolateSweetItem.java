@@ -8,16 +8,16 @@ import javax.annotation.Nullable;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.FoodHandler;
 import net.dries007.tfc.common.capabilities.food.FoodTrait;
-import net.dries007.tfc.common.items.DecayingItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class ChocolateSweetItem extends DecayingItem {
+public class ChocolateSweetItem extends Item {
     public static Map<FoodTrait, MobEffectInstance> TRAIT_EFFECTS = new HashMap<>();
 
     public static void registerTraitEffects() {
