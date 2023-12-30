@@ -11,8 +11,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ChannelBlockEntityRenderer implements BlockEntityRenderer<ChannelBlockEntity>
@@ -26,7 +26,7 @@ public class ChannelBlockEntityRenderer implements BlockEntityRenderer<ChannelBl
         }
         
         Fluid fluid = ForgeRegistries.FLUIDS.getValue(channel.getFluid());
-        ResourceLocation texture = fluid.getAttributes().getStillTexture();
+        var texture = IClientFluidTypeExtensions.of(fluid.getFluidType()).getFlowingTexture();
         int color = RenderHelpers.getFluidColor(fluid);
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(texture);
 
