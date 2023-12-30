@@ -27,7 +27,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 // Used to add states to render a connection between channels and crucibles
-@Mixin(CrucibleBlock.class)
+@Mixin(value = CrucibleBlock.class, remap = false)
 public abstract class CrucibleBlockMixin extends DeviceBlock 
 {
     @Shadow @Final

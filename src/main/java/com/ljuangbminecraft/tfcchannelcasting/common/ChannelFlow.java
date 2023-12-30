@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.BiMap;
@@ -170,7 +171,7 @@ public class ChannelFlow
                 BlockPos relative = channelSource.offset( currentChannel.multiply(-1) );
                 int distance = Math.abs(relative.getX() + relative.getY() + relative.getZ());
                 BlockPos normal = new BlockPos(relative.getX()/distance, relative.getY()/distance, relative.getZ()/distance);
-                flowSource.put(currentChannel, Pair.of(Direction.fromNormal(normal), (byte) distance));
+                flowSource.put(currentChannel, Pair.of(Direction.fromDelta(normal.getX(), normal.getY(), normal.getZ()), (byte) distance));
                 nFlows.put(channelSource, nFlows.getOrDefault(channelSource, 0) + 1);
             }
         }
@@ -182,7 +183,7 @@ public class ChannelFlow
                     flowSource.get(channelOrMold),
                     true, 
                     nFlows.get(channelOrMold),
-                    fluid.getRegistryName()
+                    ForgeRegistries.FLUIDS.getKey(fluid)
                 )
             );
             level.getBlockEntity(channelOrMold, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
@@ -191,12 +192,12 @@ public class ChannelFlow
                 )
             );
         }
-
+        var pos = source.getBlockPos().offset( originChannel.multiply(-1) );
         level.getBlockEntity(originChannel, TFCCCBlockEntities.CHANNEL.get()).get().setLinkProperties(
-            Pair.of(Direction.fromNormal(source.getBlockPos().offset( originChannel.multiply(-1) )), (byte) 1), 
+            Pair.of(Direction.fromDelta(pos.getX(), pos.getY(), pos.getZ()), (byte) 1),
             false, 
-            nFlows.get(originChannel), 
-            fluid.getRegistryName()
+            nFlows.get(originChannel),
+            ForgeRegistries.FLUIDS.getKey(fluid)
         );
     }
 
