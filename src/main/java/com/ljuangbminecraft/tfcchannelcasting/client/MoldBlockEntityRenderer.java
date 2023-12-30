@@ -81,7 +81,7 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
                     metal -> {
                         if (moldItem.getTemperature() < metal.getMeltTemperature())
                         {
-                            TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(metal.getTextureId());
+                            TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(RenderHelpers.BLOCKS_ATLAS).apply(metal.getSoftTextureId());
 
                             RenderHelpers.renderTexturedQuads(
                                 poseStack, builder, sprite, combinedLight, combinedOverlay, 
