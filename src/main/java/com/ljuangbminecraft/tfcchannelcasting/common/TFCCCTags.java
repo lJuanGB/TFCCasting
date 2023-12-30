@@ -1,7 +1,8 @@
 package com.ljuangbminecraft.tfcchannelcasting.common;
 
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
@@ -18,7 +19,7 @@ public class TFCCCTags
 
         private static TagKey<Fluid> create(String id)
         {
-            return TagKey.create(Registry.FLUID_REGISTRY, new ResourceLocation("tfcchannelcasting", id));
+            return FluidTags.create(new ResourceLocation("tfcchannelcasting", id));
         }
     }
 
@@ -28,7 +29,7 @@ public class TFCCCTags
 
         private static TagKey<Item> create(String id)
         {
-            return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation("tfcchannelcasting", id));
+            return ItemTags.create(new ResourceLocation("tfcchannelcasting", id));
         }
     }
 }
