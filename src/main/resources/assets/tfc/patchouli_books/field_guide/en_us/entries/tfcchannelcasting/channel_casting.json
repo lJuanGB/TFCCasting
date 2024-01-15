@@ -20,7 +20,7 @@
       {
         "type": "tfc:heat_recipe",
         "recipe": "tfcchannelcasting:heating/channel",
-        "text": "After the channels and mold table are knapped, they will need to be $(thing)fired$(), like any piece of pottery. Finally, $(thing)Channels$() can be activated with a redstone pulse and $(thing)Mold Tables$() output a comparator signal and interact with $(thing)Dispenser$() with water or olive oil buckets."
+        "text": "After the channels and mold table are knapped, they will need to be $(thing)fired$(), like any piece of pottery."
       },
       {
         "type": "patchouli:multiblock",
@@ -28,6 +28,11 @@
         "name": "A casting set up",
         "text": "",
         "enable_visualize": false
+      },
+      {
+        "type": "patchouli:text",
+        "text": "$(li)Using a bellow on a $(thing)Mold Table$() will cool the metal faster.$()$(li)Activating a $(thing)Channel$() with a redstone pulse will start pouring the metal.$()$(li)$(thing)Mold Tables$() output a comparator signal.",
+        "title": "Automation"
       }
     ],
     "read_by_default": true

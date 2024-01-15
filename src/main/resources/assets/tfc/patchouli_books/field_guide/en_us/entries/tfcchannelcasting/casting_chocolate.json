@@ -14,7 +14,7 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Chocolate confections provide the same nutrition as chocolate bars, but they are faster to eat. However, if these confections are prepared at specific times of the year, they will gain a trait that doubles their nutrition. $(thing)Chocolate Hearts$() gain the $(thing)Romantic$() trait in Februrary, $(thing)Chocolate Christmas Bells$() gain the $(thing)Festive$() trait in December, and $(thing)Chocolate Candy Knives$() gain the $(thing)Scary$() trait in October."
+      "text": "Chocolate confections provide the same nutrition as chocolate bars, but they are faster to eat. However, if these confections are prepared at specific times of the year, they will gain a trait that doubles their nutrition. $(thing)Chocolate Hearts$() gain the $(thing)Romantic$() trait in Februrary, $(thing)Chocolate Winter Bells$() gain the $(thing)Festive$() trait in December, and $(thing)Chocolate Candy Knives$() gain the $(thing)Scary$() trait in October."
     },
     {
       "type": "patchouli:text",
