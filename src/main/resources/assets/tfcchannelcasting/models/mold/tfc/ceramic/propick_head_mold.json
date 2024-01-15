@@ -1,0 +1,24 @@
+{
+  "__comment__": "This file was automatically created by mcresources",
+  "loader": "tfcchannelcasting:mold",
+  "textures": {
+    "0": "tfcchannelcasting:block/mold_texture",
+    "particle": "tfcchannelcasting:block/mold_texture"
+  },
+  "pattern": [
+    "XXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXX",
+    "XX     XXXXXXX",
+    "XXX     XXXXXX",
+    "XXXX     XXXXX",
+    "XXXXX     XXXX",
+    "XXXXXX     XXX",
+    "XXXXXXX     XX",
+    "XXXXXXXX    XX",
+    "XXXXXXXXX  XXX",
+    "XXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXX"
+  ]
+}
