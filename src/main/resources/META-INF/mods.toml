@@ -31,7 +31,7 @@ logoFile="examplemod.png" #optional
 # A text field displayed in the mod UI
 credits="Thanks for this mod goes to the TFC authors and community" #optional
 # A text field displayed in the mod UI
-authors="lJuanGB" #optional
+authors="lJuanGB, Uncandango" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''
 A mod to add casting through channels for the crucible.
