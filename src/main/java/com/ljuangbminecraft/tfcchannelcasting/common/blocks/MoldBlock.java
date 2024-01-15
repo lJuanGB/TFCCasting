@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.TFCCCBlockEntities;
 
+import net.dries007.tfc.common.blocks.devices.IBellowsConsumer;
 import net.dries007.tfc.common.blocks.DirectionPropertyBlock;
 import net.dries007.tfc.common.blocks.EntityBlockExtension;
 import net.dries007.tfc.common.blocks.ExtendedBlock;
@@ -33,7 +34,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
+public class MoldBlock extends ExtendedBlock implements EntityBlockExtension, IBellowsConsumer
 {
     public static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION = PipeBlock.PROPERTY_BY_DIRECTION.entrySet().stream()
         .filter(facing -> facing.getKey().getAxis().isHorizontal()).collect(Util.toMap());
@@ -148,5 +149,11 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension
                 return 0;
             }
         ).orElse(0);
+    }
+
+    @Override
+    public void intakeAir(Level level, BlockPos pos, BlockState state, int amount)
+    {
+        level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(mold -> mold.intakeAir(amount));
     }
 }

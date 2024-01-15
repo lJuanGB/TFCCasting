@@ -379,6 +379,16 @@ public class MoldBlockEntity extends TickableInventoryBlockEntity<MoldBlockEntit
         }
     }
 
+    public void intakeAir(int amount)
+    {
+        final ItemStack drainStack = this.inventory.getStackInSlot(MOLD_SLOT);
+        Optional.ofNullable( MoldLike.get(drainStack) ).ifPresent(
+            moldItem -> {
+                moldItem.setTemperature( Math.max(0, moldItem.getTemperature() - amount/4 ) );
+            }
+        );
+    }
+
     // This inventory delegates the fluid and heat handler to the
     // item in the mold stack, as long as this item has the
     // corresponding capabilities (i.e. a mold item is present).
