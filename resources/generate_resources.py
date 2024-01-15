@@ -1,11 +1,11 @@
-import copy
 from enum import Enum, auto
 import json
-import sys
 from typing import *
 
 from mcresources import RecipeContext, ResourceManager, utils, atlases
 from mcresources.type_definitions import ResourceIdentifier, Json
+
+from mold_patterns import MOLD_PATTERNS
 
 POTTERY_MELT = 1400 - 1
 POTTERY_HEAT_CAPACITY = 1.2  # Heat Capacity # Useful comment
@@ -52,28 +52,6 @@ class Metal(NamedTuple):
 
     def ingot_heat_capacity(self) -> float:
         return 1 / self.heat_capacity_base
-
-
-MOLDS = (
-    "INGOT",
-    "PICKAXE_HEAD",
-    "PROPICK_HEAD",
-    "AXE_HEAD",
-    "SHOVEL_HEAD",
-    "HOE_HEAD",
-    "CHISEL_HEAD",
-    "HAMMER_HEAD",
-    "SAW_BLADE",
-    "JAVELIN_HEAD",
-    "SWORD_BLADE",
-    "MACE_HEAD",
-    "KNIFE_BLADE",
-    "SCYTHE_BLADE",
-    "FIRE_INGOT",
-    "BELL",
-)
-
-CUSTOM_MOLDS = ("HEART",)
 
 CHOCOLATES = ("dark_chocolate", "milk_chocolate", "white_chocolate")
 
@@ -558,11 +536,6 @@ def load_lang(mngr: ResourceManager):
 
 
 def generate_items(mngr: ResourceManager):
-    [
-        mngr.item("mold/" + mold.lower()).with_lang(mold + " Render Item")
-        for mold in list(MOLDS) + list(CUSTOM_MOLDS)
-    ]
-
     mngr.item("unfired_channel").with_lang("Unfired Casting Channel").with_tag(
         "tfc:unfired_pottery", False
     ).with_item_model(
@@ -603,11 +576,7 @@ def generate_items(mngr: ResourceManager):
 def generate_tags(mngr: ResourceManager):
     mngr.item_tag(
         "accepted_in_mold_table",
-        *["tfc:ceramic/" + mold.lower() + "_mold" for mold in MOLDS],
-    )
-    mngr.item_tag(
-        "accepted_in_mold_table",
-        *["tfcchannelcasting:" + mold.lower() + "_mold" for mold in CUSTOM_MOLDS],
+        *sorted(MOLD_PATTERNS.keys()),
     )
 
 
@@ -778,7 +747,7 @@ def generate_chocolate_stuff(mngr: ResourceManager):
                 "tfc:ceramic/bell_mold",
                 "tfc:ceramic/knife_blade_mold",
             ),
-            ("Heart", "Christmas Bell", "Candy Knife"),
+            ("Heart", "Winter Bell", "Candy Knife"),
         ):
             item = f"{chocolate}_{chocolate_type}"
             loc = f"tfcchannelcasting:food/{item}"
@@ -941,6 +910,20 @@ def generate_chocolate_stuff(mngr: ResourceManager):
 def generate_atlas(mngr):
     mngr.atlas('chocolates', atlases.directory('block/metal/smooth'))
 
+def generate_mold_models(mngr: ResourceManager):
+    for mold_item_location, pattern in MOLD_PATTERNS.items():
+        path = mold_item_location.replace(":","/").split("/")
+        mngr.write(
+            (*mngr.resource_dir, 'assets', mngr.domain, 'models', 'mold', *path), 
+            {
+                "loader": "tfcchannelcasting:mold",
+                "textures": {
+                    "0": "tfcchannelcasting:block/mold_texture",
+                    "particle": "tfcchannelcasting:block/mold_texture"
+                },
+                'pattern': pattern
+            }
+        )
 
 def main():
     mngr = ResourceManager(
@@ -952,6 +935,7 @@ def main():
     generate_recipes(mngr)
     generate_chocolate_stuff(mngr)
     generate_atlas(mngr)
+    generate_mold_models(mngr)
     load_lang(mngr)
     mngr.flush()
 

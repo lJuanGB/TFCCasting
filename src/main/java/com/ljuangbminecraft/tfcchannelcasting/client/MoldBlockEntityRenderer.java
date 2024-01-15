@@ -1,5 +1,7 @@
 package com.ljuangbminecraft.tfcchannelcasting.client;
 
+import static com.ljuangbminecraft.tfcchannelcasting.TFCChannelCasting.MOD_ID;
+
 import java.util.Optional;
 
 import com.ljuangbminecraft.tfcchannelcasting.common.blockentities.MoldBlockEntity;
@@ -16,6 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -85,12 +88,12 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
 
                             RenderHelpers.renderTexturedQuads(
                                 poseStack, builder, sprite, combinedLight, combinedOverlay, 
-                                RenderHelpers.getYVertices(2f / 16, 1f / 16, 2f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, 14f / 16), 
+                                RenderHelpers.getYVertices(2f / 16, 1f / 16, 2f / 16, 14f / 16, (1 + fillPercent*0.95f)/16, 14f / 16), 
                                 16f * (14f / 16 - 2f / 16), 16f * (14f / 16 - 2f / 16), 0, 0, 1, true);
                         }
                         else // fluid
                         {
-                            RenderHelpers.renderFluidFace(poseStack, fluidInTank, buffer, 2f / 16, 2f / 16, 14f / 16, 14f / 16, (1 + fillPercent*0.99f)/16, combinedOverlay, combinedLight);
+                            RenderHelpers.renderFluidFace(poseStack, fluidInTank, buffer, 2f / 16, 2f / 16, 14f / 16, 14f / 16, (1 + fillPercent*0.95f)/16, combinedOverlay, combinedLight);
                         }
                     }
                 );
@@ -100,13 +103,17 @@ public class MoldBlockEntityRenderer implements BlockEntityRenderer<MoldBlockEnt
 
             // Render the mold
             poseStack.pushPose();
-            poseStack.translate(0.5, 0.5, 0.5);
-            TFCCCItems.getRenderItem(ForgeRegistries.ITEMS.getKey(moldStack.getItem())).ifPresent(
-                (item) -> {
-                    ItemStack moldRenderStack = item.get().getDefaultInstance();
-                    Minecraft.getInstance().getItemRenderer().renderStatic(moldRenderStack, ItemDisplayContext.FIXED, combinedLight, combinedOverlay, poseStack, buffer, mold.getLevel(), 0);
-                }
+            ResourceLocation moldLocation = ForgeRegistries.ITEMS.getKey(moldStack.getItem());
+            ResourceLocation modelLocation = new ResourceLocation(
+                MOD_ID,
+                "mold/" + moldLocation.getNamespace() + "/" + moldLocation.getPath()
             );
+            BakedModel model = Minecraft.getInstance().getModelManager().getModel(modelLocation);
+            if (model != null)
+            {
+                Minecraft.getInstance().getItemRenderer().renderModelLists(
+                    model, ItemStack.EMPTY, combinedLight, combinedOverlay, poseStack, builder);
+            }
             poseStack.popPose();
         }        
     }
