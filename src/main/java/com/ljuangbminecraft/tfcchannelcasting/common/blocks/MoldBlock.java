@@ -12,6 +12,7 @@ import net.dries007.tfc.common.blocks.EntityBlockExtension;
 import net.dries007.tfc.common.blocks.ExtendedBlock;
 import net.dries007.tfc.common.blocks.ExtendedProperties;
 import net.dries007.tfc.common.capabilities.MoldLike;
+import net.dries007.tfc.util.Helpers;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -155,5 +156,18 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension, IB
     public void intakeAir(Level level, BlockPos pos, BlockState state, int amount)
     {
         level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(mold -> mold.intakeAir(amount));
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving)
+    {
+        level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
+            mold -> {
+                Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.MOLD_SLOT));
+                Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.OUTPUT_SLOT));
+            }
+        );
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }
