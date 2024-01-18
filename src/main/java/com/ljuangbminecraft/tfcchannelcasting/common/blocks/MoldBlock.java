@@ -162,12 +162,15 @@ public class MoldBlock extends ExtendedBlock implements EntityBlockExtension, IB
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving)
     {
-        level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
-            mold -> {
-                Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.MOLD_SLOT));
-                Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.OUTPUT_SLOT));
-            }
-        );
+        if (newState.getBlock() != state.getBlock())
+        {
+            level.getBlockEntity(pos, TFCCCBlockEntities.MOLD_TABLE.get()).ifPresent(
+                mold -> {
+                    Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.MOLD_SLOT));
+                    Helpers.spawnItem(level, pos, mold.getInventory().getStackInSlot(MoldBlockEntity.OUTPUT_SLOT));
+                }
+            );
+        }
         super.onRemove(state, level, pos, newState, isMoving);
     }
 }
