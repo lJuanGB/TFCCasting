@@ -8,11 +8,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Map;
 import java.util.function.Supplier;
-
 import com.ljuangbminecraft.tfcchannelcasting.common.TFCCCTags;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.ExtraFluid;
 import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
-
+import com.ljuangbminecraft.tfcchannelcasting.config.TFCCCConfig;
 import net.dries007.tfc.common.items.MoldItem;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +31,11 @@ public class TFCCCItems {
 
     public static final RegistryObject<Item> UNFIRED_HEART_MOLD = register("unfired_heart_mold");
     public static final RegistryObject<Item> HEART_MOLD = register("heart_mold",
-            () -> new MoldItem(() -> 100, TFCCCTags.Fluids.USABLE_IN_HEART_MOLD, new Item.Properties()));
+            () -> new MoldItem(
+                TFCCCConfig.SERVER.moldHeartCapacity, 
+                TFCCCTags.Fluids.USABLE_IN_HEART_MOLD, 
+                new Item.Properties())
+            );
 
     public static final Map<ExtraFluid, RegistryObject<BucketItem>> EXTRA_FLUID_BUCKETS = Helpers.mapOfKeys(
             ExtraFluid.class,

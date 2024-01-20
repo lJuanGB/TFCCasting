@@ -12,6 +12,7 @@ import com.ljuangbminecraft.tfcchannelcasting.common.blocks.TFCCCFluids;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCItems;
 import com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs.ModifyConditions;
 import com.ljuangbminecraft.tfcchannelcasting.common.recipes.outputs.TFCCCItemStackModifiers;
+import com.ljuangbminecraft.tfcchannelcasting.config.TFCCCConfig;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.ChocolateSweetItem;
 import com.ljuangbminecraft.tfcchannelcasting.common.items.TFCCCFoodTraits;
 import com.mojang.logging.LogUtils;
@@ -48,6 +49,8 @@ public class TFCChannelCasting {
                 TFCCCBlockEntities.BLOCK_ENTITIES.register(bus);
                 TFCCCItems.ITEMS.register(bus);
                 TFCCCFluids.FLUIDS.register(bus);
+
+                TFCCCConfig.init();
 
                 bus.addListener(this::setup);
 
